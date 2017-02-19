@@ -60,9 +60,14 @@ long lval;
 }
 
 %token <token> INDENT UNINDENT LBRACK RBRACK
-%token <token> START
+%token <token> START FINISH
+%token <token> WHILE FOR IN RANGE TO 
+%token <token> BREAK CONTINUE
+%token <token> IF ELSE ELIF CASE DEFAULT
+%token <token> RETURN
 %token <token> COLON 
 %token <token> NOT COMMA EQ OROR ANDAND OR XOR AND EQEQ NOTEQ LT LTEQ GT GTEQ PLUS MINUS MULT DIV MOD SIZEOF NEG COMP LPAREN RPAREN
+%token <token> BOOL INT LONG CHAR REAL STRING
 //TODO change types to str
 %token <str> ID
 %token <str> CONST_INT CONST_REAL 
@@ -70,24 +75,30 @@ long lval;
 %token <str> CONST_LONG
 %token <str> TRUE FALSE 
 //End-of-TODO
-%token <token> BOOL INT LONG CHAR REAL STRING
-/*%token <token> READ WRITE
+/*
+%token <token> READ WRITE
 %token <token> START FINISH
 */
-/*
-%token <token> BREAK CONTINUE
-%token <token> IF ELSE ELIF CASE DEFAULT
-%token <token> WHILE FOR IN RANGE TO 
-%token <token> RETURN
-*/
 
+%type <test> program
+%type <test> start finish
 %type <test> var_dcl
 %type <test> ts_dcl 
-%type <test> ts_dcl2
 %type <test> ts_dcl1
-%type <test> block
-%type <test> block_0
+%type <test> func_dcl 
+%type <test> func_dcl1
+%type <test> block //block_0
+%type <test> return_stmt
+%type <test> cond_stmt cond_stmt1 cond_stmt2
+%type <test> loop_stmt 
+%type <test> loop_stmt1 loop_stmt2
+%type <test> id1
 %type <test> expr
+%type <test> expr1
+%type <test> statement
+%type <test> assignment
+%type <test> func_call
+%type <test> func_param func_param1 func_param2
 %type <test> bin_op
 %type <test> arithmetic
 %type <test> conditional
@@ -113,62 +124,334 @@ long lval;
 %right SIZEOF NEG COMP NOT
 %left LPAREN RPAREN
 
-%start block
+%start program
 
 %%
 
+program : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NProgram(); program = $$;
+#endif
+}
+	| var_dcl program					{
+#if TEST_MODE > TEST_PARSER
+$2->block.push_back(*$1); $$ = $2;
+#endif
+}
+	| func_dcl program					{
+#if TEST_MODE > TEST_PARSER
+$2->block.push_back(*$1); $$ = $2;
+#endif
+}
+
+	| start program						{
+#if TEST_MODE > TEST_PARSER
+$2->start = $1; $$ = $2;
+#endif
+}
+	| finish program					{
+#if TEST_MODE > TEST_PARSER
+$2->finish = $1; $$ = $2;
+#endif
+}
+
+;
+
+start : 
+	  START id						{
+#if TEST_MODE > TEST_PARSER
+$$ = $2;
+#endif
+}
+;
+finish : 
+	  FINISH id						{
+#if TEST_MODE > TEST_PARSER
+$$ = $2;
+#endif
+}
+;
+
 var_dcl : 
-	  id ts_dcl					{
+	  id ts_dcl						{
 #if TEST_MODE > TEST_PARSER
-//$$ = new NVarDecl(*$1, *$2);
+$$ = new NVarDecl(*$1, *$2);
 #endif
 }
 ;
+
 ts_dcl : 
-	  LBRACK type ts_dcl2				{
+	LBRACK type ts_dcl1 RBRACK				{ 
 #if TEST_MODE > TEST_PARSER
-//$$ = new TsDeclList(); $$->push_back( new NTsDecl($2, new NInteger(1)) );
+$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
+#endif
+}
+	| LBRACK type LT const_int GT ts_dcl1 RBRACK		{ 
+#if TEST_MODE > TEST_PARSER
+$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
+#endif
+}
+;
+ts_dcl1 : 							{ 
+#if TEST_MODE > TEST_PARSER
+$$ = new TsDeclList(); 
+#endif
+}
+	| COMMA type LT const_int GT ts_dcl1			{
+#if TEST_MODE > TEST_PARSER
+$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
+#endif
+}
+	| COMMA type ts_dcl1					{
+#if TEST_MODE > TEST_PARSER
+$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
 ;
 
-ts_dcl2 :
-	  RBRACK				{
+func_dcl : 
+	  id COLON INDENT block UNINDENT				{
 #if TEST_MODE > TEST_PARSER
-//$$ = new TsDeclList(); $$->push_back( new NTsDecl($2, new NInteger(1)) );
+$$ = new NFunctionDecl(*$1, *$4);
 #endif
 }
-	| ts_dcl1 RBRACK			{
+	| ts_dcl id var_dcl func_dcl1 COLON INDENT block UNINDENT 	{
 #if TEST_MODE > TEST_PARSER
-//$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3;
+$4->push_back($3); $$ = new NFunctionDecl(*$1, *$2, *$4, *$7);
 #endif
 }
-	| LT const_int GT ts_dcl1 RBRACK	{
+	| ts_dcl id COLON INDENT block UNINDENT				{
 #if TEST_MODE > TEST_PARSER
-//$6->push_back(new NTsDecl($2, *$4)); $$ = $6;
+$$ = new NFunctionDecl(*$1, *$2, *$5);
 #endif
 }
-;
-
-ts_dcl1 : 						{
+	| id var_dcl func_dcl1 COLON INDENT block UNINDENT		{
 #if TEST_MODE > TEST_PARSER
-//$$ = new TsDeclList();
-#endif
-}
-	| COMMA type LT const_int GT ts_dcl1		{
-#if TEST_MODE > TEST_PARSER
-//$6->push_back(new NTsDecl($2, *$4)); $$ = $6;
-#endif
-}
-	| COMMA type ts_dcl1				{
-#if TEST_MODE > TEST_PARSER
-//$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3;
+$3->push_back($2); $$ = new NFunctionDecl(*$1, *$3, *$6);
 #endif
 }
 ;
 
+func_dcl1 : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new VariableList();
+#endif
+}
+	| COMMA var_dcl func_dcl1				{
+#if TEST_MODE > TEST_PARSER
+$$ = $3; $$->push_back($2);
+#endif
+}
+;
+
+block : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NBlock();
+#endif
+}
+	| var_dcl block						{
+#if TEST_MODE > TEST_PARSER
+$2->statements.push_back($1); $$ = $2;
+#endif
+}
+	| statement block					{
+#if TEST_MODE > TEST_PARSER
+$2->statements.push_back($1); $$ = $2;
+#endif
+}
+;
+
+statement : 
+	  assignment
+	| func_call
+	| cond_stmt
+	| loop_stmt
+/*
+*/
+	| return_stmt
+	| BREAK							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NBreak();
+#endif
+}
+	| CONTINUE						{
+#if TEST_MODE > TEST_PARSER
+$$ = new NContinue();
+#endif
+}
+;
+
+assignment : 
+	  id EQ expr expr1					{
+#if TEST_MODE > TEST_PARSER
+$4->push_back($3); $$ = new NAssignment(*$1, *$4);
+#endif
+}
+	| id LBRACK expr expr1 RBRACK EQ expr expr1		{
+#if TEST_MODE > TEST_PARSER
+$4->push_back($3); $8->push_back($7); $$ = new NAssignment(*$1, *$4, *$8);
+#endif
+}
+	| var_dcl EQ expr expr1					{
+#if TEST_MODE > TEST_PARSER
+$4->push_back($3); $$ = new NAssignment(*$1, *$4);
+#endif
+}
+;
+expr1 : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new ExpressionList();
+#endif
+}
+	| COMMA expr expr1					{
+#if TEST_MODE > TEST_PARSER
+$3->push_back($2); $$ = $3;
+#endif
+}
+;
+
+func_call : 
+	  id func_param						{
+#if TEST_MODE > TEST_PARSER
+$$ = new NFuncCall(*$1, *$2);
+#endif
+}
+/*
+	| SIZEOF LPAREN sizeof1 RPAREN				{ $$ = $3; }
+	| STRLEN LPAREN id RPAREN				{ $$ = new NStrlen(*$3); }
+	| CONCAT LPAREN id COMMA id RPAREN			{ $$ = new NConcat(*$3, *$5); }
+	| READ LPAREN id RPAREN					{ $$ = new NRead(*$3); }
+	| WRITE LPAREN expr RPAREN				{ $$ = new NWrite(*$3); }
+;
+
+sizeof1 : 							{ $$ = new NSizeOf(); }
+	| type							{ $$ = new NSizeOf($1); }
+	| id							{ $$ = new NSizeOf(*$1); }
+*/
+;
+
+func_param : 
+	   LPAREN func_param1 func_param2 RPAREN		{
+#if TEST_MODE > TEST_PARSER
+$3->push_back($2); $$ = $3;
+#endif
+}
+;
+func_param1 :							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NBlank();
+#endif
+}
+	/*| id	*/
+	| expr		//TODO	
+	/*| const_val	*/
+;
+func_param2 :							{
+#if TEST_MODE > TEST_PARSER
+$$ = new ExpressionList();
+#endif
+}
+	| COMMA func_param1 func_param2				{
+#if TEST_MODE > TEST_PARSER
+$3->push_back($2); $$ = $3;
+#endif
+}
+;
+
+cond_stmt : 
+	  IF expr COLON INDENT block UNINDENT cond_stmt1	{
+#if TEST_MODE > TEST_PARSER
+$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
+#endif
+}
+	| IF expr COLON INDENT block UNINDENT cond_stmt1 ELSE COLON INDENT block UNINDENT
+								{
+#if TEST_MODE > TEST_PARSER
+$7->bl.push_back($5); $7->bl.push_back($11); $7->el.push_back($2); $$ = $7;
+#endif
+}
+	| CASE expr COLON INDENT cond_stmt2 UNINDENT		{
+#if TEST_MODE > TEST_PARSER
+$5->Expression = *$2; $$ = $5;
+#endif
+}
+	| CASE expr COLON INDENT cond_stmt2 DEFAULT COLON INDENT block	UNINDENT UNINDENT
+								{
+#if TEST_MODE > TEST_PARSER
+$5->bl.push_back($9); $5->Expression = *$2; $$ = $5;
+#endif
+}
+;
+cond_stmt1 : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NIf();
+#endif
+}	//NIf() has two list: Block and Expression List. if we have 'else' then bl.length -1 = el.length . if we do not have 'else' then bl.length = el.length .
+	| ELIF expr COLON INDENT block UNINDENT cond_stmt1	{
+#if TEST_MODE > TEST_PARSER
+$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
+#endif
+}
+;
+
+cond_stmt2 : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NCase();
+#endif
+}
+	| const_val COLON INDENT block UNINDENT cond_stmt2	{
+#if TEST_MODE > TEST_PARSER
+$6->bl.push_back($4); $6->ExpressionlList.push_back($1); $$ = $6;
+#endif
+}
+;
+
+loop_stmt :
+//	  FOR id IN COLON block
+	  FOR id IN loop_stmt1 COLON INDENT block UNINDENT	{
+#if TEST_MODE > TEST_PARSER
+$$ = new NFor(*$2, *$4, *$7);
+#endif
+}		//new NFor(NIdentifier id, NExpression range, NBlock block);
+	| WHILE expr COLON INDENT block	UNINDENT		{
+#if TEST_MODE > TEST_PARSER
+$$ = new NWhile(*$2, *$5);
+#endif
+}		//new NWhile(NExpression condition, NBlock block);
+;
+loop_stmt1 :							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NBlank();
+#endif
+}
+	| id							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NExpression(*$1);
+#endif
+}
+	| RANGE loop_stmt2					{
+#if TEST_MODE > TEST_PARSER
+$$ = new NExpression(*$2);
+#endif
+}
+	| RANGE loop_stmt2 TO loop_stmt2			{
+#if TEST_MODE > TEST_PARSER
+$$ = new NExpression(*$2, *$4);
+#endif
+}
+;
+loop_stmt2 :							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NBlank();
+#endif
+}
+	| const_int
+	| id
+;
+
+/*
 block  : block block_0
-	| %empty /* empty */
+	| %empty // empty
 ;
 
 block_0 :  INDENT block UNINDENT	{
@@ -180,30 +463,33 @@ $$ = new NBlock();
 	|  var_dcl
 
 ;
-/*
-block : 							{ $$ = new NBlock(); }
-	| statement block					{ $2->statements.push_back($1); $$ = $2; }
-;
-
-statement : 
-	  assignment
-	| func_call
-	| cond_stmt
-	| loop_stmt
-	| return_stmt
-	| BREAK							{ $$ = new NBreak(); }
-	| CONTINUE						{ $$ = new NContinue(); }
-;
-
-assignment : 
-	  id EQ expr expr1					{ $4->push_back($3); $$ = new NAssignment(*$1, *$4); }
-	| id LBRACK expr expr1 RBRACK EQ expr expr1		{ $4->push_back($3); $8->push_back($7); $$ = new NAssignment(*$1, *$4, *$8); }
-	| var_dcl EQ expr expr1					{ $4->push_back($3); $$ = new NAssignment(*$1, *$4); }
-;
-expr1 : 							{ $$ = new ExpressionList(); }
-	| COMMA expr expr1					{ $3->push_back($2); $$ = $3; }
-;
 */
+
+return_stmt :
+	  RETURN  						{
+#if TEST_MODE > TEST_PARSER
+$$ = new NReturn( new IdentifierList() );
+#endif
+}
+	| RETURN id id1 					{
+#if TEST_MODE > TEST_PARSER
+$3->push_back($2); $$ = new NReturn(*$3);
+#endif
+}
+;
+
+id1 :								{
+#if TEST_MODE > TEST_PARSER
+$$ = new IdentifierList();
+#endif
+}
+	| COMMA id id1						{
+#if TEST_MODE > TEST_PARSER
+$3->push_back($2); $$ = $3;
+#endif
+}
+;
+
 expr :
 	  LPAREN expr RPAREN	{
 #if TEST_MODE > TEST_PARSER
@@ -215,16 +501,17 @@ $$ = $2;
 $$ = new NExpression(*$1, $2, *$3);
 #endif
 }
-/*	| func_call		{
+	| func_call		{
 #if TEST_MODE > TEST_PARSER
 $$ = new NExpression(*$1);
 #endif
-} */
+}
 	| id			{
 #if TEST_MODE > TEST_PARSER
 $$ = new NExpression(*$1);
 #endif
 }
+	| id LBRACK expr RBRACK //TODO
 	| const_val		{
 #if TEST_MODE > TEST_PARSER
 $$ = new NExpression(*$1);
@@ -310,8 +597,7 @@ $$ = new NIdentifier (*$1); delete $1;
 
 %%
 
-#if TEST_MODE > TEST_PARSER
-#else
+#if TEST_MODE == TEST_PARSER
 
 #include<cctype>
 #include<cstring>
