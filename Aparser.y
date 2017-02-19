@@ -21,6 +21,8 @@
 
 #if TEST_MODE > TEST_PARSER
 NBlock *programBlock; /* the top level root node of our final AST */
+NIdentifier* start = NULL;
+NIdentifier* finish = NULL;
 #endif
 
  /*NProgram *program; /* the top level root node of our final AST */
@@ -30,33 +32,39 @@ extern FILE *yyin;
 void yyerror(const char *s) { printf("ERROR: %s\n", s); }
 
 %}
-
+/*
 %union{ 
 //#if TEST_MODE > TEST_PARSER
 //Node *node;
 //NBlock *block;
 //NIdentifier *ident;
-/*
-%union {
-    Node *node;
-    NBlock *block;
-    NExpression *expr;
-    NStatement *stmt;
-    NIdentifier *ident;
-    NVariableDeclaration *var_decl;
-    std::vector<NVariableDeclaration*> *varvec;
-    std::vector<NExpression*> *exprvec;
-    std::string *string;
-    int token;
-}
-*/
+
 //#endif
 int test;
 int token;
 std::string *str;
 /*bool bval;
 long lval;
+}
 */
+
+
+
+%union {
+	Node *node;
+	NBlock *block;
+	NExpression *expr;
+	NStatement *stmt;
+	NIdentifier *ident;
+	std::vector<TsDecl*> TsDeclList;
+	//std::vector<ExprBlock*> ExprBlockList;
+	std::vector<NIdentifier*> IdentifierList;
+	std::vector<NStatement*> StatementList;
+	std::vector<NExpression*> ExpressionList;
+	std::vector<NVarDecl*> VariableList;
+
+	std::string *string;
+	int token;
 }
 
 %token <token> INDENT UNINDENT LBRACK RBRACK
@@ -80,31 +88,31 @@ long lval;
 %token <token> START FINISH
 */
 
-%type <test> program
-%type <test> start finish
-%type <test> var_dcl
-%type <test> ts_dcl 
-%type <test> ts_dcl1
-%type <test> func_dcl 
-%type <test> func_dcl1
-%type <test> block //block_0
-%type <test> return_stmt
-%type <test> cond_stmt cond_stmt1 cond_stmt2
-%type <test> loop_stmt 
-%type <test> loop_stmt1 loop_stmt2
-%type <test> id1
-%type <test> expr
-%type <test> expr1
-%type <test> statement
-%type <test> assignment
-%type <test> func_call
-%type <test> func_param func_param1 func_param2
-%type <test> bin_op
-%type <test> arithmetic
-%type <test> conditional
-%type <test> const_val const_int
-%type <test> type
-%type <test> id
+%type <block> program
+%type <ident> start finish
+%type <stmt> var_dcl
+%type <TsDeclList> ts_dcl 
+%type <TsDeclList> ts_dcl1
+%type <stmt> func_dcl 
+%type <VariableList> func_dcl1
+%type <block> block //block_0
+%type <stmt> return_stmt
+%type <stmt> cond_stmt cond_stmt1 cond_stmt2
+%type <stmt> loop_stmt 
+%type <expr> loop_stmt1 loop_stmt2
+%type <IdentifierList> id1
+%type <expr> expr
+%type <ExpressionList> expr1
+%type <stmt> statement
+%type <stmt> assignment
+%type <expr> func_call func_param1
+%type <ExpressionList> func_param func_param2
+%type <token> bin_op
+%type <token> arithmetic
+%type <token> conditional
+%type <expr> const_val const_int
+%type <token> type
+%type <ident> id
 /*
 %type type
 %type const_int
@@ -130,28 +138,32 @@ long lval;
 
 program : 							{
 #if TEST_MODE > TEST_PARSER
-$$ = new NProgram(); program = $$;
+$$ = new NBlock(); programBlock = $$;
 #endif
 }
 	| var_dcl program					{
 #if TEST_MODE > TEST_PARSER
-$2->block.push_back(*$1); $$ = $2;
+if( $1 != NULL) $2->statements.push_back(*$1); $$ = $2;
 #endif
 }
 	| func_dcl program					{
 #if TEST_MODE > TEST_PARSER
-$2->block.push_back(*$1); $$ = $2;
+if( $1 != NULL) $2->statements.push_back(*$1); $$ = $2;
 #endif
 }
 
 	| start program						{
 #if TEST_MODE > TEST_PARSER
-$2->start = $1; $$ = $2;
+if( start == NULL ) start = *$1; 
+else yyerror("multiple definition of start");
+$$ = NULL;
 #endif
 }
 	| finish program					{
 #if TEST_MODE > TEST_PARSER
-$2->finish = $1; $$ = $2;
+if( finish == NULL ) finish = *$1;
+else yyerror("multiple definition of finish");
+$$ = NULL;
 #endif
 }
 
@@ -183,12 +195,14 @@ $$ = new NVarDecl(*$1, *$2);
 ts_dcl : 
 	LBRACK type ts_dcl1 RBRACK				{ 
 #if TEST_MODE > TEST_PARSER
-$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
+$3.emplace_back($2, new NInteger(1)); $$ = $3;
+//$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
 	| LBRACK type LT const_int GT ts_dcl1 RBRACK		{ 
 #if TEST_MODE > TEST_PARSER
-$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
+$6.emplace_back($2, *$4)); $$ = $6;
+//$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
 #endif
 }
 ;
@@ -199,12 +213,14 @@ $$ = new TsDeclList();
 }
 	| COMMA type LT const_int GT ts_dcl1			{
 #if TEST_MODE > TEST_PARSER
-$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
+$6.emplace_back($2, *$4)); $$ = $6;
+//$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
 #endif
 }
 	| COMMA type ts_dcl1					{
 #if TEST_MODE > TEST_PARSER
-$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
+$3.emplace_back($2, new NInteger(1)); $$ = $3;
+//$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
 ;
@@ -263,7 +279,7 @@ $2->statements.push_back($1); $$ = $2;
 
 statement : 
 	  assignment
-	| func_call
+	| func_call						{ $<stmt>$ = $1; }
 	| cond_stmt
 	| loop_stmt
 	| return_stmt
@@ -340,8 +356,8 @@ func_param1 :							{
 $$ = new NBlank();
 #endif
 }
+	| expr	
 	/*| id	*/
-	| expr		//TODO	
 	/*| const_val	*/
 ;
 func_param2 :							{
@@ -359,13 +375,16 @@ $3->push_back($2); $$ = $3;
 cond_stmt : 
 	  IF expr COLON INDENT block UNINDENT cond_stmt1	{
 #if TEST_MODE > TEST_PARSER
-$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
+$7->ebl.emplace_back($2, $5); $$ = $7;
+//$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
 #endif
 }
 	| IF expr COLON INDENT block UNINDENT cond_stmt1 ELSE COLON INDENT block UNINDENT
 								{
 #if TEST_MODE > TEST_PARSER
-$7->bl.push_back($5); $7->bl.push_back($11); $7->el.push_back($2); $$ = $7;
+$7->ebl.emplace_back($2, $5);
+$7->ebl.emplace_back(new NBool(true), $11); $$ = $7;
+//$7->bl.push_back($5); $7->bl.push_back($11); $7->el.push_back($2); $$ = $7;
 #endif
 }
 	| CASE expr COLON INDENT cond_stmt2 UNINDENT		{
@@ -376,7 +395,7 @@ $5->Expression = *$2; $$ = $5;
 	| CASE expr COLON INDENT cond_stmt2 DEFAULT COLON INDENT block	UNINDENT UNINDENT
 								{
 #if TEST_MODE > TEST_PARSER
-$5->bl.push_back($9); $5->Expression = *$2; $$ = $5;
+$5->ebl.emplace_back(new NBool(true), $9); $5->Expression = *$2; $$ = $5;
 #endif
 }
 ;
@@ -387,7 +406,8 @@ $$ = new NIf();
 }	//NIf() has two list: Block and Expression List. if we have 'else' then bl.length -1 = el.length . if we do not have 'else' then bl.length = el.length .
 	| ELIF expr COLON INDENT block UNINDENT cond_stmt1	{
 #if TEST_MODE > TEST_PARSER
-$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
+$7->ebl.emplace_back($2, $5); $$ = $7;
+//$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
 #endif
 }
 ;
@@ -399,7 +419,7 @@ $$ = new NCase();
 }
 	| const_val COLON INDENT block UNINDENT cond_stmt2	{
 #if TEST_MODE > TEST_PARSER
-$6->bl.push_back($4); $6->ExpressionlList.push_back($1); $$ = $6;
+$6->ebl.emplace_back($1, $4); $$ = $6;
 #endif
 }
 ;
@@ -429,7 +449,7 @@ $$ = new NExpression(*$1);
 }
 	| RANGE loop_stmt2					{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression(*$2);
+$$ = new NExpression(0, *$2);
 #endif
 }
 	| RANGE loop_stmt2 TO loop_stmt2			{
@@ -444,7 +464,7 @@ $$ = new NBlank();
 #endif
 }
 	| const_int
-	| id
+	| id							{$<expr>$ = $1;}
 ;
 
 /*
@@ -496,38 +516,42 @@ $$ = $2;
 }
 	| expr bin_op expr	{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression(*$1, $2, *$3);
+$$ = new NBineryOp(*$1, $2, *$3);
 #endif
 }
 	| func_call		{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression(*$1);
+//$$ = new NExpression(*$1);
 #endif
 }
 	| id			{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression(*$1);
+//$$ = new NExpression(*$1);
 #endif
 }
-	| id LBRACK expr RBRACK //TODO
+	| id LBRACK expr RBRACK {
+#if TEST_MODE > TEST_PARSER
+$$ = new NArrayExpr(*$1, *$3);
+#endif
+}
 	| const_val		{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression(*$1);
+//$$ = new NExpression(*$1);
 #endif
 }
 	| MINUS expr		{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression($1, *$2);
+$$ = new NUnaryOp($1, *$2);
 #endif
 }
 	| NOT expr		{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression($1, *$2);
+$$ = new NUnaryOp($1, *$2);
 #endif
 }
 	| COMP expr		{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression($1, *$2);
+$$ = new NUnaryOp($1, *$2);
 #endif
 }
 ;

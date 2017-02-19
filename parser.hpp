@@ -111,35 +111,24 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 34 "Aparser.y" /* yacc.c:1909  */
- 
-//#if TEST_MODE > TEST_PARSER
-//Node *node;
-//NBlock *block;
-//NIdentifier *ident;
-/*
-%union {
-    Node *node;
-    NBlock *block;
-    NExpression *expr;
-    NStatement *stmt;
-    NIdentifier *ident;
-    NVariableDeclaration *var_decl;
-    std::vector<NVariableDeclaration*> *varvec;
-    std::vector<NExpression*> *exprvec;
-    std::string *string;
-    int token;
-}
-*/
-//#endif
-int test;
-int token;
-std::string *str;
-/*bool bval;
-long lval;
-*/
+#line 53 "Aparser.y" /* yacc.c:1909  */
 
-#line 143 "parser.hpp" /* yacc.c:1909  */
+	Node *node;
+	NBlock *block;
+	NExpression *expr;
+	NStatement *stmt;
+	NIdentifier *ident;
+	TsDeclList tsdecl;
+	//std::vector<ExprBlock*> ExprBlockList;
+	std::vector<NIdentifier*> IdentifierList;
+	std::vector<NStatement*> StatementList;
+	std::vector<NExpression*> ExpressionList;
+	std::vector<NVarDecl*> VariableList;
+
+	std::string *string;
+	int token;
+
+#line 132 "parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
