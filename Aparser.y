@@ -266,8 +266,6 @@ statement :
 	| func_call
 	| cond_stmt
 	| loop_stmt
-/*
-*/
 	| return_stmt
 	| BREAK							{
 #if TEST_MODE > TEST_PARSER
