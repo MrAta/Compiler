@@ -1,0 +1,10 @@
+
+
+#define TEST_SCANNER	1
+#define TEST_PARSER	2
+#define TEST_CODEGEN	3
+#define TEST_NONE	4
+
+#define TEST_MODE	TEST_PARSER
+
+
