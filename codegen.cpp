@@ -69,7 +69,7 @@ Value* NIdentifier::codeGen(CodeGenContext& context)
 	return new LoadInst(context.locals()[name], "", false, context.currentBlock());
 }
 
-Value* N NFuncCall::codeGen(CodeGenContext& context)
+Value* NFuncCall::codeGen(CodeGenContext& context)
 {
 	Function *function = context.module->getFunction(id.name.c_str());
 	if (function == NULL) {
@@ -83,5 +83,47 @@ Value* N NFuncCall::codeGen(CodeGenContext& context)
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	std::cout << "Creating method call: " << id.name << endl;
 	return call;
+}
+
+Value* NAssignment::codeGen(CodeGenContext& context)
+{	
+	switch(type){
+			case 1:
+			{
+				std::cout << "Creating assignment for " << id.name <<endl;
+			
+			}
+			break;
+			case 2:
+			{
+				std::cout << "Creating assignment for " << vd.id.name <<endl;
+				
+			}
+			break;
+			case 3:
+			{
+				std::cout << "Creating assignment for " << id.name <<endl;
+				
+			}
+			break;
+	}
+	
+	/*	if (context.locals().find(lhs.name) == context.locals().end()) {
+		std::cerr << "undeclared variable " << lhs.name << endl;
+		return NULL;
+	}
+	return new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());*/
+}
+
+Value* NBlock::codeGen(CodeGenContext& context)
+{
+	StatementList::const_iterator it;
+	Value *last = NULL;
+	for (it = statements.begin(); it != statements.end(); it++) {
+		std::cout << "Generating code for " << typeid(**it).name() << endl;
+		last = (**it).codeGen(context);
+	}
+	std::cout << "Creating block" << endl;
+	return last;
 }
 
