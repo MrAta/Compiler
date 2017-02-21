@@ -280,8 +280,7 @@ public:
 	NIdentifier& id;
 	VariableList arguments;
 	NBlock& block;
-	NFunctionDecl(TsDeclList& returns, NIdentifier& id, 
-			VariableList& arguments, NBlock& block) :
+	NFunctionDecl(TsDeclList& returns, NIdentifier& id, VariableList& arguments, NBlock& block) :
 		returns(returns), id(id), arguments(arguments), block(block) { }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };

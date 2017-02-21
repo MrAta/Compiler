@@ -78,10 +78,9 @@
 
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <stdbool.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdbool>
 #define YYDEBUG 1
 
 #if TEST_MODE > TEST_PARSER
@@ -97,7 +96,7 @@ extern FILE *yyin;
 void yyerror(const char *s) { printf("ERROR: %s\n", s); }
 
 
-#line 101 "parser.cpp" /* yacc.c:339  */
+#line 100 "parser.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -198,24 +197,44 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 53 "Aparser.y" /* yacc.c:355  */
+#line 52 "Aparser.y" /* yacc.c:355  */
 
+public:
+#if TEST_MODE > TEST_PARSER
 	Node *node;
 	NBlock *block;
 	NExpression *expr;
 	NStatement *stmt;
+	NVarDecl* var;
 	NIdentifier *ident;
-	std::vector<TsDecl*> TsDeclList;
+	NIf *iff;
+	NFor *forr;
+	NCase *casee;
+	NWhile *whilee;
+	std::vector<TsDecl*> *tsdeclvec;
 	//std::vector<ExprBlock*> ExprBlockList;
-	std::vector<NIdentifier*> identvec;
+	std::vector<NIdentifier*> *identvec;
 //	std::vector<NStatement*> stmtvec;
-	std::vector<NExpression*> exprvec;
-	std::vector<NVarDecl*> varvec;
+	std::vector<NExpression*> *exprvec;
+	std::vector<NVarDecl*> *varvec;
+#else
+	int   test;
+#define	node  test
+#define	expr  test
+#define	stmt  test
+#define	ident test
+#define	tsdeclvec test
+#define	ExprBlockList test
+#define	identvec test
+#define	stmtvec test
+#define	exprvec test
+#define	varvec test
 
-	std::string *string;
+#endif
+	std::string *str;
 	int token;
 
-#line 219 "parser.cpp" /* yacc.c:355  */
+#line 238 "parser.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -232,7 +251,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 236 "parser.cpp" /* yacc.c:358  */
+#line 255 "parser.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -535,17 +554,17 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   139,   139,   144,   149,   155,   162,   173,   180,   188,
-     196,   202,   209,   214,   220,   229,   234,   239,   244,   251,
-     256,   263,   268,   273,   281,   282,   283,   284,   285,   286,
-     291,   299,   304,   309,   315,   320,   328,   348,   354,   359,
-     363,   368,   376,   382,   390,   395,   402,   407,   415,   420,
-     429,   434,   440,   445,   450,   455,   461,   466,   467,   487,
-     492,   499,   504,   512,   517,   522,   527,   532,   537,   542,
-     547,   552,   559,   560,   563,   563,   563,   563,   563,   563,
-     563,   563,   563,   563,   566,   566,   566,   566,   566,   566,
-     570,   571,   576,   581,   586,   591,   596,   603,   603,   603,
-     603,   603,   603,   606,   613
+       0,   160,   160,   165,   170,   176,   183,   194,   201,   209,
+     217,   223,   230,   235,   241,   250,   255,   260,   265,   272,
+     277,   284,   289,   294,   302,   303,   304,   305,   306,   307,
+     312,   320,   325,   330,   336,   341,   349,   369,   375,   380,
+     384,   389,   397,   403,   411,   416,   423,   428,   436,   441,
+     450,   455,   461,   466,   471,   476,   482,   487,   488,   508,
+     513,   520,   525,   533,   538,   543,   548,   553,   558,   563,
+     568,   573,   580,   581,   584,   584,   584,   584,   584,   584,
+     584,   584,   584,   584,   587,   587,   587,   587,   587,   587,
+     591,   592,   597,   602,   607,   612,   620,   627,   627,   627,
+     627,   627,   627,   630,   637
 };
 #endif
 
@@ -1497,731 +1516,734 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 139 "Aparser.y" /* yacc.c:1646  */
+#line 160 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.block) = new NBlock(); programBlock = (yyval.block);
 #endif
 }
-#line 1507 "parser.cpp" /* yacc.c:1646  */
+#line 1526 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 144 "Aparser.y" /* yacc.c:1646  */
+#line 165 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-if( (yyvsp[-1].stmt) != NULL) (yyvsp[0].block)->statements.push_back(*(yyvsp[-1].stmt)); (yyval.block) = (yyvsp[0].block);
+if( (yyvsp[-1].var) != NULL) (yyvsp[0].block)->statements.push_back((yyvsp[-1].var)); (yyval.block) = (yyvsp[0].block);
 #endif
 }
-#line 1517 "parser.cpp" /* yacc.c:1646  */
+#line 1536 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 149 "Aparser.y" /* yacc.c:1646  */
+#line 170 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-if( (yyvsp[-1].stmt) != NULL) (yyvsp[0].block)->statements.push_back(*(yyvsp[-1].stmt)); (yyval.block) = (yyvsp[0].block);
+if( (yyvsp[-1].stmt) != NULL) (yyvsp[0].block)->statements.push_back((yyvsp[-1].stmt)); (yyval.block) = (yyvsp[0].block);
 #endif
 }
-#line 1527 "parser.cpp" /* yacc.c:1646  */
+#line 1546 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 155 "Aparser.y" /* yacc.c:1646  */
+#line 176 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-if( start == NULL ) start = *(yyvsp[-1].ident); 
+if( start == NULL ) start = (yyvsp[-1].ident); 
 else yyerror("multiple definition of start");
 (yyval.block) = NULL;
 #endif
 }
-#line 1539 "parser.cpp" /* yacc.c:1646  */
+#line 1558 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 162 "Aparser.y" /* yacc.c:1646  */
+#line 183 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-if( finish == NULL ) finish = *(yyvsp[-1].ident);
+if( finish == NULL ) finish = (yyvsp[-1].ident);
 else yyerror("multiple definition of finish");
 (yyval.block) = NULL;
 #endif
 }
-#line 1551 "parser.cpp" /* yacc.c:1646  */
+#line 1570 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 173 "Aparser.y" /* yacc.c:1646  */
+#line 194 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.ident) = (yyvsp[0].ident);
 #endif
 }
-#line 1561 "parser.cpp" /* yacc.c:1646  */
+#line 1580 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 180 "Aparser.y" /* yacc.c:1646  */
+#line 201 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.ident) = (yyvsp[0].ident);
 #endif
 }
-#line 1571 "parser.cpp" /* yacc.c:1646  */
+#line 1590 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 188 "Aparser.y" /* yacc.c:1646  */
+#line 209 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.stmt) = new NVarDecl(*(yyvsp[-1].ident), *(yyvsp[0].TsDeclList));
+(yyval.var) = new NVarDecl(*(yyvsp[-1].ident), *(yyvsp[0].tsdeclvec));
 #endif
 }
-#line 1581 "parser.cpp" /* yacc.c:1646  */
+#line 1600 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 196 "Aparser.y" /* yacc.c:1646  */
+#line 217 "Aparser.y" /* yacc.c:1646  */
     { 
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-1].TsDeclList).emplace_back((yyvsp[-2].token), new NInteger(1)); (yyval.TsDeclList) = (yyvsp[-1].TsDeclList);
+(yyvsp[-1].tsdeclvec)->emplace_back((yyvsp[-2].token), new NInteger(1)); (yyval.tsdeclvec) = (yyvsp[-1].tsdeclvec);
 //$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
-#line 1592 "parser.cpp" /* yacc.c:1646  */
+#line 1611 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 202 "Aparser.y" /* yacc.c:1646  */
+#line 223 "Aparser.y" /* yacc.c:1646  */
     { 
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-1].TsDeclList).emplace_back((yyvsp[-5].token), *(yyvsp[-3].expr))); (yyval.TsDeclList) = (yyvsp[-1].TsDeclList);
+(yyvsp[-1].tsdeclvec)->emplace_back((yyvsp[-5].token), *(yyvsp[-3].expr)); (yyval.tsdeclvec) = (yyvsp[-1].tsdeclvec);
 //$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
 #endif
 }
-#line 1603 "parser.cpp" /* yacc.c:1646  */
+#line 1622 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 209 "Aparser.y" /* yacc.c:1646  */
+#line 230 "Aparser.y" /* yacc.c:1646  */
     { 
 #if TEST_MODE > TEST_PARSER
-(yyval.TsDeclList) = new TsDeclList(); 
+(yyval.tsdeclvec) = new TsDeclList(); 
 #endif
 }
-#line 1613 "parser.cpp" /* yacc.c:1646  */
+#line 1632 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 214 "Aparser.y" /* yacc.c:1646  */
+#line 235 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].TsDeclList).emplace_back((yyvsp[-4].token), *(yyvsp[-2].expr))); (yyval.TsDeclList) = (yyvsp[0].TsDeclList);
+(yyvsp[0].tsdeclvec)->emplace_back((yyvsp[-4].token), *(yyvsp[-2].expr)); (yyval.tsdeclvec) = (yyvsp[0].tsdeclvec);
 //$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
 #endif
 }
-#line 1624 "parser.cpp" /* yacc.c:1646  */
+#line 1643 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 220 "Aparser.y" /* yacc.c:1646  */
+#line 241 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].TsDeclList).emplace_back((yyvsp[-1].token), new NInteger(1)); (yyval.TsDeclList) = (yyvsp[0].TsDeclList);
+(yyvsp[0].tsdeclvec)->emplace_back((yyvsp[-1].token), new NInteger(1)); (yyval.tsdeclvec) = (yyvsp[0].tsdeclvec);
 //$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
-#line 1635 "parser.cpp" /* yacc.c:1646  */
+#line 1654 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 229 "Aparser.y" /* yacc.c:1646  */
+#line 250 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.stmt) = new NFunctionDecl(*(yyvsp[-4].ident), *(yyvsp[-1].block));
+(yyval.stmt) = new NFunctionDecl(new TsDeclList(), *(yyvsp[-4].ident), new VariableList(), *(yyvsp[-1].block));
 #endif
 }
-#line 1645 "parser.cpp" /* yacc.c:1646  */
+#line 1664 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 234 "Aparser.y" /* yacc.c:1646  */
+#line 255 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-4].varvec)->push_back((yyvsp[-5].stmt)); (yyval.stmt) = new NFunctionDecl(*(yyvsp[-7].TsDeclList), *(yyvsp[-6].ident), *(yyvsp[-4].varvec), *(yyvsp[-1].block));
+(yyvsp[-4].varvec)->push_back((yyvsp[-5].var)); (yyval.stmt) = new NFunctionDecl(*(yyvsp[-7].tsdeclvec), *(yyvsp[-6].ident), *(yyvsp[-4].varvec), *(yyvsp[-1].block));
 #endif
 }
-#line 1655 "parser.cpp" /* yacc.c:1646  */
+#line 1674 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 239 "Aparser.y" /* yacc.c:1646  */
+#line 260 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.stmt) = new NFunctionDecl(*(yyvsp[-5].TsDeclList), *(yyvsp[-4].ident), *(yyvsp[-1].block));
+(yyval.stmt) = new NFunctionDecl(*(yyvsp[-5].tsdeclvec), *(yyvsp[-4].ident), new VariableList(), *(yyvsp[-1].block));
 #endif
 }
-#line 1665 "parser.cpp" /* yacc.c:1646  */
+#line 1684 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 244 "Aparser.y" /* yacc.c:1646  */
+#line 265 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-4].varvec)->push_back((yyvsp[-5].stmt)); (yyval.stmt) = new NFunctionDecl(*(yyvsp[-6].ident), *(yyvsp[-4].varvec), *(yyvsp[-1].block));
+(yyvsp[-4].varvec)->push_back((yyvsp[-5].var)); (yyval.stmt) = new NFunctionDecl(new TsDeclList(), *(yyvsp[-6].ident), *(yyvsp[-4].varvec), *(yyvsp[-1].block));
 #endif
 }
-#line 1675 "parser.cpp" /* yacc.c:1646  */
+#line 1694 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 251 "Aparser.y" /* yacc.c:1646  */
+#line 272 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.varvec) = new VariableList();
 #endif
 }
-#line 1685 "parser.cpp" /* yacc.c:1646  */
+#line 1704 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 256 "Aparser.y" /* yacc.c:1646  */
+#line 277 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.varvec) = (yyvsp[0].varvec); (yyval.varvec)->push_back((yyvsp[-1].stmt));
+(yyval.varvec) = (yyvsp[0].varvec); (yyval.varvec)->push_back((yyvsp[-1].var));
 #endif
 }
-#line 1695 "parser.cpp" /* yacc.c:1646  */
+#line 1714 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 263 "Aparser.y" /* yacc.c:1646  */
+#line 284 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.block) = new NBlock();
 #endif
 }
-#line 1705 "parser.cpp" /* yacc.c:1646  */
+#line 1724 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 268 "Aparser.y" /* yacc.c:1646  */
+#line 289 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].block)->statements.push_back((yyvsp[-1].stmt)); (yyval.block) = (yyvsp[0].block);
+(yyvsp[0].block)->statements.push_back((yyvsp[-1].var)); (yyval.block) = (yyvsp[0].block);
 #endif
 }
-#line 1715 "parser.cpp" /* yacc.c:1646  */
+#line 1734 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 273 "Aparser.y" /* yacc.c:1646  */
+#line 294 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyvsp[0].block)->statements.push_back((yyvsp[-1].stmt)); (yyval.block) = (yyvsp[0].block);
 #endif
 }
-#line 1725 "parser.cpp" /* yacc.c:1646  */
+#line 1744 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 282 "Aparser.y" /* yacc.c:1646  */
+#line 303 "Aparser.y" /* yacc.c:1646  */
     { (yyval.stmt) = (yyvsp[0].expr); }
-#line 1731 "parser.cpp" /* yacc.c:1646  */
+#line 1750 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 286 "Aparser.y" /* yacc.c:1646  */
+#line 307 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.stmt) = new NBreak();
 #endif
 }
-#line 1741 "parser.cpp" /* yacc.c:1646  */
+#line 1760 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 291 "Aparser.y" /* yacc.c:1646  */
+#line 312 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.stmt) = new NContinue();
 #endif
 }
-#line 1751 "parser.cpp" /* yacc.c:1646  */
+#line 1770 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 299 "Aparser.y" /* yacc.c:1646  */
+#line 320 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-3].ident), *(yyvsp[0].exprvec));
 #endif
 }
-#line 1761 "parser.cpp" /* yacc.c:1646  */
+#line 1780 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 304 "Aparser.y" /* yacc.c:1646  */
+#line 325 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyvsp[-4].exprvec)->push_back((yyvsp[-5].expr)); (yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-7].ident), *(yyvsp[-4].exprvec), *(yyvsp[0].exprvec));
 #endif
 }
-#line 1771 "parser.cpp" /* yacc.c:1646  */
+#line 1790 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 309 "Aparser.y" /* yacc.c:1646  */
+#line 330 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-3].stmt), *(yyvsp[0].exprvec));
+(yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-3].var), *(yyvsp[0].exprvec));
 #endif
 }
-#line 1781 "parser.cpp" /* yacc.c:1646  */
+#line 1800 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 315 "Aparser.y" /* yacc.c:1646  */
+#line 336 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.exprvec) = new ExpressionList();
 #endif
 }
-#line 1791 "parser.cpp" /* yacc.c:1646  */
+#line 1810 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 320 "Aparser.y" /* yacc.c:1646  */
+#line 341 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.exprvec) = (yyvsp[0].exprvec);
 #endif
 }
-#line 1801 "parser.cpp" /* yacc.c:1646  */
+#line 1820 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 328 "Aparser.y" /* yacc.c:1646  */
+#line 349 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NFuncCall(*(yyvsp[-1].ident), *(yyvsp[0].exprvec));
 #endif
 }
-#line 1811 "parser.cpp" /* yacc.c:1646  */
+#line 1830 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 348 "Aparser.y" /* yacc.c:1646  */
+#line 369 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyvsp[-1].exprvec)->push_back((yyvsp[-2].expr)); (yyval.exprvec) = (yyvsp[-1].exprvec);
 #endif
 }
-#line 1821 "parser.cpp" /* yacc.c:1646  */
+#line 1840 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 354 "Aparser.y" /* yacc.c:1646  */
+#line 375 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NBlank();
 #endif
 }
-#line 1831 "parser.cpp" /* yacc.c:1646  */
+#line 1850 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 363 "Aparser.y" /* yacc.c:1646  */
+#line 384 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.exprvec) = new ExpressionList();
 #endif
 }
-#line 1841 "parser.cpp" /* yacc.c:1646  */
+#line 1860 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 368 "Aparser.y" /* yacc.c:1646  */
+#line 389 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.exprvec) = (yyvsp[0].exprvec);
 #endif
 }
-#line 1851 "parser.cpp" /* yacc.c:1646  */
+#line 1870 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 376 "Aparser.y" /* yacc.c:1646  */
+#line 397 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].stmt)->ebl.emplace_back((yyvsp[-5].expr), (yyvsp[-2].block)); (yyval.stmt) = (yyvsp[0].stmt);
+(yyvsp[0].iff)->ebl.emplace_back((yyvsp[-5].expr), (yyvsp[-2].block)); (yyval.stmt) = (yyvsp[0].iff);
 //$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
 #endif
 }
-#line 1862 "parser.cpp" /* yacc.c:1646  */
+#line 1881 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 383 "Aparser.y" /* yacc.c:1646  */
+#line 404 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-5].stmt)->ebl.emplace_back((yyvsp[-10].expr), (yyvsp[-7].block));
-(yyvsp[-5].stmt)->ebl.emplace_back(new NBool(true), (yyvsp[-1].block)); (yyval.stmt) = (yyvsp[-5].stmt);
+(yyvsp[-5].iff)->ebl.emplace_back((yyvsp[-10].expr), (yyvsp[-7].block));
+(yyvsp[-5].iff)->ebl.emplace_back(new NBool(true), (yyvsp[-1].block)); (yyval.stmt) = (yyvsp[-5].iff);
 //$7->bl.push_back($5); $7->bl.push_back($11); $7->el.push_back($2); $$ = $7;
 #endif
 }
-#line 1874 "parser.cpp" /* yacc.c:1646  */
+#line 1893 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 390 "Aparser.y" /* yacc.c:1646  */
+#line 411 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-1].stmt)->Expression = *(yyvsp[-4].expr); (yyval.stmt) = (yyvsp[-1].stmt);
+(yyvsp[-1].casee)->Expression = *(yyvsp[-4].expr); (yyval.stmt) = (yyvsp[-1].casee);
 #endif
 }
-#line 1884 "parser.cpp" /* yacc.c:1646  */
+#line 1903 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 396 "Aparser.y" /* yacc.c:1646  */
+#line 417 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-6].stmt)->ebl.emplace_back(new NBool(true), (yyvsp[-2].block)); (yyvsp[-6].stmt)->Expression = *(yyvsp[-9].expr); (yyval.stmt) = (yyvsp[-6].stmt);
+(yyvsp[-6].casee)->ebl.emplace_back(new NBool(true), (yyvsp[-2].block)); (yyvsp[-6].casee)->Expression = *(yyvsp[-9].expr); (yyval.stmt) = (yyvsp[-6].casee);
 #endif
 }
-#line 1894 "parser.cpp" /* yacc.c:1646  */
+#line 1913 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 402 "Aparser.y" /* yacc.c:1646  */
+#line 423 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.stmt) = new NIf();
+(yyval.iff) = new NIf();
 #endif
 }
-#line 1904 "parser.cpp" /* yacc.c:1646  */
+#line 1923 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 407 "Aparser.y" /* yacc.c:1646  */
+#line 428 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].stmt)->ebl.emplace_back((yyvsp[-5].expr), (yyvsp[-2].block)); (yyval.stmt) = (yyvsp[0].stmt);
+(yyvsp[0].iff)->ebl.emplace_back((yyvsp[-5].expr), (yyvsp[-2].block)); (yyval.iff) = (yyvsp[0].iff);
 //$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
 #endif
 }
-#line 1915 "parser.cpp" /* yacc.c:1646  */
+#line 1934 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 415 "Aparser.y" /* yacc.c:1646  */
+#line 436 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.stmt) = new NCase();
+(yyval.casee) = new NCase();
 #endif
 }
-#line 1925 "parser.cpp" /* yacc.c:1646  */
+#line 1944 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 420 "Aparser.y" /* yacc.c:1646  */
+#line 441 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].stmt)->ebl.emplace_back((yyvsp[-5].expr), (yyvsp[-2].block)); (yyval.stmt) = (yyvsp[0].stmt);
+(yyvsp[0].casee)->ebl.emplace_back((yyvsp[-5].expr), (yyvsp[-2].block)); (yyval.casee) = (yyvsp[0].casee);
 #endif
 }
-#line 1935 "parser.cpp" /* yacc.c:1646  */
+#line 1954 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 429 "Aparser.y" /* yacc.c:1646  */
+#line 450 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.stmt) = new NFor(*(yyvsp[-6].ident), *(yyvsp[-4].expr), *(yyvsp[-1].block));
 #endif
 }
-#line 1945 "parser.cpp" /* yacc.c:1646  */
+#line 1964 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 434 "Aparser.y" /* yacc.c:1646  */
+#line 455 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.stmt) = new NWhile(*(yyvsp[-4].expr), *(yyvsp[-1].block));
 #endif
 }
-#line 1955 "parser.cpp" /* yacc.c:1646  */
+#line 1974 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 440 "Aparser.y" /* yacc.c:1646  */
-    {
-#if TEST_MODE > TEST_PARSER
-(yyval.expr) = new NBlank();
-#endif
-}
-#line 1965 "parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 53:
-#line 445 "Aparser.y" /* yacc.c:1646  */
-    {
-#if TEST_MODE > TEST_PARSER
-(yyval.expr) = new NExpression(*(yyvsp[0].ident));
-#endif
-}
-#line 1975 "parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 54:
-#line 450 "Aparser.y" /* yacc.c:1646  */
-    {
-#if TEST_MODE > TEST_PARSER
-(yyval.expr) = new NExpression(0, *(yyvsp[0].expr));
-#endif
-}
-#line 1985 "parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 55:
-#line 455 "Aparser.y" /* yacc.c:1646  */
-    {
-#if TEST_MODE > TEST_PARSER
-(yyval.expr) = new NExpression(*(yyvsp[-2].expr), *(yyvsp[0].expr));
-#endif
-}
-#line 1995 "parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 56:
 #line 461 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NBlank();
 #endif
 }
-#line 2005 "parser.cpp" /* yacc.c:1646  */
+#line 1984 "parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 53:
+#line 466 "Aparser.y" /* yacc.c:1646  */
+    {
+#if TEST_MODE > TEST_PARSER
+(yyval.expr) = new NExpression(*(yyvsp[0].ident));
+#endif
+}
+#line 1994 "parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 54:
+#line 471 "Aparser.y" /* yacc.c:1646  */
+    {
+#if TEST_MODE > TEST_PARSER
+(yyval.expr) = new NExpression(0, *(yyvsp[0].expr));
+#endif
+}
+#line 2004 "parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 55:
+#line 476 "Aparser.y" /* yacc.c:1646  */
+    {
+#if TEST_MODE > TEST_PARSER
+(yyval.expr) = new NExpression(*(yyvsp[-2].expr), *(yyvsp[0].expr));
+#endif
+}
+#line 2014 "parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 56:
+#line 482 "Aparser.y" /* yacc.c:1646  */
+    {
+#if TEST_MODE > TEST_PARSER
+(yyval.expr) = new NBlank();
+#endif
+}
+#line 2024 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 467 "Aparser.y" /* yacc.c:1646  */
+#line 488 "Aparser.y" /* yacc.c:1646  */
     {(yyval.expr) = (yyvsp[0].ident);}
-#line 2011 "parser.cpp" /* yacc.c:1646  */
+#line 2030 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 487 "Aparser.y" /* yacc.c:1646  */
+#line 508 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.stmt) = new NReturn( new IdentifierList() );
 #endif
 }
-#line 2021 "parser.cpp" /* yacc.c:1646  */
+#line 2040 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 492 "Aparser.y" /* yacc.c:1646  */
+#line 513 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyvsp[0].identvec)->push_back((yyvsp[-1].ident)); (yyval.stmt) = new NReturn(*(yyvsp[0].identvec));
 #endif
 }
-#line 2031 "parser.cpp" /* yacc.c:1646  */
+#line 2050 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 499 "Aparser.y" /* yacc.c:1646  */
+#line 520 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.identvec) = new IdentifierList();
 #endif
 }
-#line 2041 "parser.cpp" /* yacc.c:1646  */
+#line 2060 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 504 "Aparser.y" /* yacc.c:1646  */
+#line 525 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyvsp[0].identvec).push_back((yyvsp[-1].ident)); (yyval.identvec) = (yyvsp[0].identvec);
 #endif
 }
-#line 2051 "parser.cpp" /* yacc.c:1646  */
+#line 2070 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 512 "Aparser.y" /* yacc.c:1646  */
+#line 533 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = (yyvsp[-1].expr);
 #endif
 }
-#line 2061 "parser.cpp" /* yacc.c:1646  */
+#line 2080 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 517 "Aparser.y" /* yacc.c:1646  */
+#line 538 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NBineryOp(*(yyvsp[-2].expr), (yyvsp[-1].token), *(yyvsp[0].expr));
 #endif
 }
-#line 2071 "parser.cpp" /* yacc.c:1646  */
+#line 2090 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 522 "Aparser.y" /* yacc.c:1646  */
+#line 543 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 //$$ = new NExpression(*$1);
 #endif
 }
-#line 2081 "parser.cpp" /* yacc.c:1646  */
+#line 2100 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 527 "Aparser.y" /* yacc.c:1646  */
+#line 548 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 //$$ = new NExpression(*$1);
 #endif
 }
-#line 2091 "parser.cpp" /* yacc.c:1646  */
+#line 2110 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 532 "Aparser.y" /* yacc.c:1646  */
+#line 553 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NArrayExpr(*(yyvsp[-3].ident), *(yyvsp[-1].expr));
 #endif
 }
-#line 2101 "parser.cpp" /* yacc.c:1646  */
+#line 2120 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 537 "Aparser.y" /* yacc.c:1646  */
+#line 558 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 //$$ = new NExpression(*$1);
 #endif
 }
-#line 2111 "parser.cpp" /* yacc.c:1646  */
+#line 2130 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 542 "Aparser.y" /* yacc.c:1646  */
+#line 563 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NUnaryOp((yyvsp[-1].token), *(yyvsp[0].expr));
 #endif
 }
-#line 2121 "parser.cpp" /* yacc.c:1646  */
+#line 2140 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 547 "Aparser.y" /* yacc.c:1646  */
+#line 568 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NUnaryOp((yyvsp[-1].token), *(yyvsp[0].expr));
 #endif
 }
-#line 2131 "parser.cpp" /* yacc.c:1646  */
+#line 2150 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 552 "Aparser.y" /* yacc.c:1646  */
+#line 573 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NUnaryOp((yyvsp[-1].token), *(yyvsp[0].expr));
 #endif
 }
-#line 2141 "parser.cpp" /* yacc.c:1646  */
+#line 2160 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 571 "Aparser.y" /* yacc.c:1646  */
+#line 592 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NReal( atof((yyvsp[0].str)->c_str() ) ); delete (yyvsp[0].str);
 #endif
 }
-#line 2151 "parser.cpp" /* yacc.c:1646  */
+#line 2170 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 576 "Aparser.y" /* yacc.c:1646  */
+#line 597 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NChar((yyvsp[0].str)->c_str()); delete (yyvsp[0].str);
 #endif
 }
-#line 2161 "parser.cpp" /* yacc.c:1646  */
+#line 2180 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 581 "Aparser.y" /* yacc.c:1646  */
+#line 602 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NBool(true); delete (yyvsp[0].str);
 #endif
 }
-#line 2171 "parser.cpp" /* yacc.c:1646  */
+#line 2190 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 586 "Aparser.y" /* yacc.c:1646  */
+#line 607 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NBool(false); delete (yyvsp[0].str);
 #endif
 }
-#line 2181 "parser.cpp" /* yacc.c:1646  */
+#line 2200 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 591 "Aparser.y" /* yacc.c:1646  */
+#line 612 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.expr) = new NString((yyvsp[0].str)->c_str()); delete (yyvsp[0].str);
+(yyval.expr) = new NString(
+(yyvsp[0].str)->c_str()
+); 
+delete (yyvsp[0].str);
 #endif
 }
-#line 2191 "parser.cpp" /* yacc.c:1646  */
+#line 2213 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 596 "Aparser.y" /* yacc.c:1646  */
+#line 620 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NLong( atol((yyvsp[0].str)->c_str()) ); delete (yyvsp[0].str);
 #endif
 }
-#line 2201 "parser.cpp" /* yacc.c:1646  */
+#line 2223 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 103:
-#line 606 "Aparser.y" /* yacc.c:1646  */
+#line 630 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.expr) = new NInteger( atoi((yyvsp[0].str)->c_str() ) ); delete (yyvsp[0].str);
 #endif
 }
-#line 2211 "parser.cpp" /* yacc.c:1646  */
+#line 2233 "parser.cpp" /* yacc.c:1646  */
     break;
 
   case 104:
-#line 613 "Aparser.y" /* yacc.c:1646  */
+#line 637 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
 (yyval.ident) = new NIdentifier (*(yyvsp[0].str)); delete (yyvsp[0].str);
 #endif
 }
-#line 2221 "parser.cpp" /* yacc.c:1646  */
+#line 2243 "parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2225 "parser.cpp" /* yacc.c:1646  */
+#line 2247 "parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2449,7 +2471,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 620 "Aparser.y" /* yacc.c:1906  */
+#line 644 "Aparser.y" /* yacc.c:1906  */
 
 
 #if TEST_MODE == TEST_PARSER

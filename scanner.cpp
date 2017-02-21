@@ -774,10 +774,10 @@ IN THE SOFTWARE.
 #define  SCAN_TRUE()		_SCAN_STR(TRUE)
 #define  SCAN_FALSE()		_SCAN_STR(FALSE)
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cassert>
 #include <stack>
 #include <iostream>
 

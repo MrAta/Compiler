@@ -13,10 +13,9 @@
 
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <stdbool.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdbool>
 #define YYDEBUG 1
 
 #if TEST_MODE > TEST_PARSER
@@ -51,19 +50,39 @@ long lval;
 
 
 %union {
+public:
+#if TEST_MODE > TEST_PARSER
 	Node *node;
 	NBlock *block;
 	NExpression *expr;
 	NStatement *stmt;
+	NVarDecl* var;
 	NIdentifier *ident;
-	std::vector<TsDecl*> TsDeclList;
+	NIf *iff;
+	NFor *forr;
+	NCase *casee;
+	NWhile *whilee;
+	std::vector<TsDecl*> *tsdeclvec;
 	//std::vector<ExprBlock*> ExprBlockList;
-	std::vector<NIdentifier*> identvec;
+	std::vector<NIdentifier*> *identvec;
 //	std::vector<NStatement*> stmtvec;
-	std::vector<NExpression*> exprvec;
-	std::vector<NVarDecl*> varvec;
+	std::vector<NExpression*> *exprvec;
+	std::vector<NVarDecl*> *varvec;
+#else
+	int   test;
+#define	node  test
+#define	expr  test
+#define	stmt  test
+#define	ident test
+#define	tsdeclvec test
+#define	ExprBlockList test
+#define	identvec test
+#define	stmtvec test
+#define	exprvec test
+#define	varvec test
 
-	std::string *string;
+#endif
+	std::string *str;
 	int token;
 }
 
@@ -90,14 +109,16 @@ long lval;
 
 %type <block> program
 %type <ident> start finish
-%type <stmt> var_dcl
-%type <TsDeclList> ts_dcl 
-%type <TsDeclList> ts_dcl1
+%type <var> var_dcl
+%type <tsdeclvec> ts_dcl 
+%type <tsdeclvec> ts_dcl1
 %type <stmt> func_dcl 
 %type <varvec> func_dcl1
 %type <block> block //block_0
 %type <stmt> return_stmt
-%type <stmt> cond_stmt cond_stmt1 cond_stmt2
+%type <stmt> cond_stmt
+%type <iff> cond_stmt1
+%type <casee> cond_stmt2
 %type <stmt> loop_stmt 
 %type <expr> loop_stmt1 loop_stmt2
 %type <identvec> id1
@@ -143,25 +164,25 @@ $$ = new NBlock(); programBlock = $$;
 }
 	| var_dcl program					{
 #if TEST_MODE > TEST_PARSER
-if( $1 != NULL) $2->statements.push_back(*$1); $$ = $2;
+if( $1 != NULL) $2->statements.push_back($1); $$ = $2;
 #endif
 }
 	| func_dcl program					{
 #if TEST_MODE > TEST_PARSER
-if( $1 != NULL) $2->statements.push_back(*$1); $$ = $2;
+if( $1 != NULL) $2->statements.push_back($1); $$ = $2;
 #endif
 }
 
 	| start program						{
 #if TEST_MODE > TEST_PARSER
-if( start == NULL ) start = *$1; 
+if( start == NULL ) start = $1; 
 else yyerror("multiple definition of start");
 $$ = NULL;
 #endif
 }
 	| finish program					{
 #if TEST_MODE > TEST_PARSER
-if( finish == NULL ) finish = *$1;
+if( finish == NULL ) finish = $1;
 else yyerror("multiple definition of finish");
 $$ = NULL;
 #endif
@@ -195,13 +216,13 @@ $$ = new NVarDecl(*$1, *$2);
 ts_dcl : 
 	LBRACK type ts_dcl1 RBRACK				{ 
 #if TEST_MODE > TEST_PARSER
-$3.emplace_back($2, new NInteger(1)); $$ = $3;
+$3->emplace_back($2, new NInteger(1)); $$ = $3;
 //$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
 	| LBRACK type LT const_int GT ts_dcl1 RBRACK		{ 
 #if TEST_MODE > TEST_PARSER
-$6.emplace_back($2, *$4)); $$ = $6;
+$6->emplace_back($2, *$4); $$ = $6;
 //$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
 #endif
 }
@@ -213,13 +234,13 @@ $$ = new TsDeclList();
 }
 	| COMMA type LT const_int GT ts_dcl1			{
 #if TEST_MODE > TEST_PARSER
-$6.emplace_back($2, *$4)); $$ = $6;
+$6->emplace_back($2, *$4); $$ = $6;
 //$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
 #endif
 }
 	| COMMA type ts_dcl1					{
 #if TEST_MODE > TEST_PARSER
-$3.emplace_back($2, new NInteger(1)); $$ = $3;
+$3->emplace_back($2, new NInteger(1)); $$ = $3;
 //$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
@@ -228,7 +249,7 @@ $3.emplace_back($2, new NInteger(1)); $$ = $3;
 func_dcl : 
 	  id COLON INDENT block UNINDENT				{
 #if TEST_MODE > TEST_PARSER
-$$ = new NFunctionDecl(*$1, *$4);
+$$ = new NFunctionDecl(new TsDeclList(), *$1, new VariableList(), *$4);
 #endif
 }
 	| ts_dcl id var_dcl func_dcl1 COLON INDENT block UNINDENT 	{
@@ -238,12 +259,12 @@ $4->push_back($3); $$ = new NFunctionDecl(*$1, *$2, *$4, *$7);
 }
 	| ts_dcl id COLON INDENT block UNINDENT				{
 #if TEST_MODE > TEST_PARSER
-$$ = new NFunctionDecl(*$1, *$2, *$5);
+$$ = new NFunctionDecl(*$1, *$2, new VariableList(), *$5);
 #endif
 }
 	| id var_dcl func_dcl1 COLON INDENT block UNINDENT		{
 #if TEST_MODE > TEST_PARSER
-$3->push_back($2); $$ = new NFunctionDecl(*$1, *$3, *$6);
+$3->push_back($2); $$ = new NFunctionDecl(new TsDeclList(), *$1, *$3, *$6);
 #endif
 }
 ;
@@ -590,7 +611,10 @@ $$ = new NBool(false); delete $1;
 }
 	| CONST_STRING 		{
 #if TEST_MODE > TEST_PARSER
-$$ = new NString($1->c_str()); delete $1;
+$$ = new NString(
+$1->c_str()
+); 
+delete $1;
 #endif
 }
 	| CONST_LONG 		{
