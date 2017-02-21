@@ -118,12 +118,12 @@ union YYSTYPE
 	NExpression *expr;
 	NStatement *stmt;
 	NIdentifier *ident;
-	TsDeclList tsdecl;
+	std::vector<TsDecl*> TsDeclList;
 	//std::vector<ExprBlock*> ExprBlockList;
-	std::vector<NIdentifier*> IdentifierList;
-	std::vector<NStatement*> StatementList;
-	std::vector<NExpression*> ExpressionList;
-	std::vector<NVarDecl*> VariableList;
+	std::vector<NIdentifier*> identvec;
+//	std::vector<NStatement*> stmtvec;
+	std::vector<NExpression*> exprvec;
+	std::vector<NVarDecl*> varvec;
 
 	std::string *string;
 	int token;

@@ -205,12 +205,12 @@ union YYSTYPE
 	NExpression *expr;
 	NStatement *stmt;
 	NIdentifier *ident;
-	TsDeclList tsdecl;
+	std::vector<TsDecl*> TsDeclList;
 	//std::vector<ExprBlock*> ExprBlockList;
-	std::vector<NIdentifier*> IdentifierList;
-	std::vector<NStatement*> StatementList;
-	std::vector<NExpression*> ExpressionList;
-	std::vector<NVarDecl*> VariableList;
+	std::vector<NIdentifier*> identvec;
+//	std::vector<NStatement*> stmtvec;
+	std::vector<NExpression*> exprvec;
+	std::vector<NVarDecl*> varvec;
 
 	std::string *string;
 	int token;
@@ -1574,7 +1574,7 @@ else yyerror("multiple definition of finish");
 #line 188 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.stmt) = new NVarDecl(*(yyvsp[-1].ident), *(yyvsp[0].tsdecl));
+(yyval.stmt) = new NVarDecl(*(yyvsp[-1].ident), *(yyvsp[0].TsDeclList));
 #endif
 }
 #line 1581 "parser.cpp" /* yacc.c:1646  */
@@ -1584,7 +1584,7 @@ else yyerror("multiple definition of finish");
 #line 196 "Aparser.y" /* yacc.c:1646  */
     { 
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-1].tsdecl).emplace_back((yyvsp[-2].token), new NInteger(1)); (yyval.tsdecl) = (yyvsp[-1].tsdecl);
+(yyvsp[-1].TsDeclList).emplace_back((yyvsp[-2].token), new NInteger(1)); (yyval.TsDeclList) = (yyvsp[-1].TsDeclList);
 //$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
@@ -1595,7 +1595,7 @@ else yyerror("multiple definition of finish");
 #line 202 "Aparser.y" /* yacc.c:1646  */
     { 
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-1].tsdecl).emplace_back((yyvsp[-5].token), *(yyvsp[-3].expr))); (yyval.tsdecl) = (yyvsp[-1].tsdecl);
+(yyvsp[-1].TsDeclList).emplace_back((yyvsp[-5].token), *(yyvsp[-3].expr))); (yyval.TsDeclList) = (yyvsp[-1].TsDeclList);
 //$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
 #endif
 }
@@ -1606,7 +1606,7 @@ else yyerror("multiple definition of finish");
 #line 209 "Aparser.y" /* yacc.c:1646  */
     { 
 #if TEST_MODE > TEST_PARSER
-(yyval.tsdecl) = new TsDeclList(); 
+(yyval.TsDeclList) = new TsDeclList(); 
 #endif
 }
 #line 1613 "parser.cpp" /* yacc.c:1646  */
@@ -1616,7 +1616,7 @@ else yyerror("multiple definition of finish");
 #line 214 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].tsdecl).emplace_back((yyvsp[-4].token), *(yyvsp[-2].expr))); (yyval.tsdecl) = (yyvsp[0].tsdecl);
+(yyvsp[0].TsDeclList).emplace_back((yyvsp[-4].token), *(yyvsp[-2].expr))); (yyval.TsDeclList) = (yyvsp[0].TsDeclList);
 //$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
 #endif
 }
@@ -1627,7 +1627,7 @@ else yyerror("multiple definition of finish");
 #line 220 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].tsdecl).emplace_back((yyvsp[-1].token), new NInteger(1)); (yyval.tsdecl) = (yyvsp[0].tsdecl);
+(yyvsp[0].TsDeclList).emplace_back((yyvsp[-1].token), new NInteger(1)); (yyval.TsDeclList) = (yyvsp[0].TsDeclList);
 //$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
 #endif
 }
@@ -1648,7 +1648,7 @@ else yyerror("multiple definition of finish");
 #line 234 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-4].VariableList)->push_back((yyvsp[-5].stmt)); (yyval.stmt) = new NFunctionDecl(*(yyvsp[-7].tsdecl), *(yyvsp[-6].ident), *(yyvsp[-4].VariableList), *(yyvsp[-1].block));
+(yyvsp[-4].varvec)->push_back((yyvsp[-5].stmt)); (yyval.stmt) = new NFunctionDecl(*(yyvsp[-7].TsDeclList), *(yyvsp[-6].ident), *(yyvsp[-4].varvec), *(yyvsp[-1].block));
 #endif
 }
 #line 1655 "parser.cpp" /* yacc.c:1646  */
@@ -1658,7 +1658,7 @@ else yyerror("multiple definition of finish");
 #line 239 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.stmt) = new NFunctionDecl(*(yyvsp[-5].tsdecl), *(yyvsp[-4].ident), *(yyvsp[-1].block));
+(yyval.stmt) = new NFunctionDecl(*(yyvsp[-5].TsDeclList), *(yyvsp[-4].ident), *(yyvsp[-1].block));
 #endif
 }
 #line 1665 "parser.cpp" /* yacc.c:1646  */
@@ -1668,7 +1668,7 @@ else yyerror("multiple definition of finish");
 #line 244 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-4].VariableList)->push_back((yyvsp[-5].stmt)); (yyval.stmt) = new NFunctionDecl(*(yyvsp[-6].ident), *(yyvsp[-4].VariableList), *(yyvsp[-1].block));
+(yyvsp[-4].varvec)->push_back((yyvsp[-5].stmt)); (yyval.stmt) = new NFunctionDecl(*(yyvsp[-6].ident), *(yyvsp[-4].varvec), *(yyvsp[-1].block));
 #endif
 }
 #line 1675 "parser.cpp" /* yacc.c:1646  */
@@ -1678,7 +1678,7 @@ else yyerror("multiple definition of finish");
 #line 251 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.VariableList) = new VariableList();
+(yyval.varvec) = new VariableList();
 #endif
 }
 #line 1685 "parser.cpp" /* yacc.c:1646  */
@@ -1688,7 +1688,7 @@ else yyerror("multiple definition of finish");
 #line 256 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.VariableList) = (yyvsp[0].VariableList); (yyval.VariableList)->push_back((yyvsp[-1].stmt));
+(yyval.varvec) = (yyvsp[0].varvec); (yyval.varvec)->push_back((yyvsp[-1].stmt));
 #endif
 }
 #line 1695 "parser.cpp" /* yacc.c:1646  */
@@ -1754,7 +1754,7 @@ else yyerror("multiple definition of finish");
 #line 299 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].ExpressionList)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-3].ident), *(yyvsp[0].ExpressionList));
+(yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-3].ident), *(yyvsp[0].exprvec));
 #endif
 }
 #line 1761 "parser.cpp" /* yacc.c:1646  */
@@ -1764,7 +1764,7 @@ else yyerror("multiple definition of finish");
 #line 304 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-4].ExpressionList)->push_back((yyvsp[-5].expr)); (yyvsp[0].ExpressionList)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-7].ident), *(yyvsp[-4].ExpressionList), *(yyvsp[0].ExpressionList));
+(yyvsp[-4].exprvec)->push_back((yyvsp[-5].expr)); (yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-7].ident), *(yyvsp[-4].exprvec), *(yyvsp[0].exprvec));
 #endif
 }
 #line 1771 "parser.cpp" /* yacc.c:1646  */
@@ -1774,7 +1774,7 @@ else yyerror("multiple definition of finish");
 #line 309 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].ExpressionList)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-3].stmt), *(yyvsp[0].ExpressionList));
+(yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.stmt) = new NAssignment(*(yyvsp[-3].stmt), *(yyvsp[0].exprvec));
 #endif
 }
 #line 1781 "parser.cpp" /* yacc.c:1646  */
@@ -1784,7 +1784,7 @@ else yyerror("multiple definition of finish");
 #line 315 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.ExpressionList) = new ExpressionList();
+(yyval.exprvec) = new ExpressionList();
 #endif
 }
 #line 1791 "parser.cpp" /* yacc.c:1646  */
@@ -1794,7 +1794,7 @@ else yyerror("multiple definition of finish");
 #line 320 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].ExpressionList)->push_back((yyvsp[-1].expr)); (yyval.ExpressionList) = (yyvsp[0].ExpressionList);
+(yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.exprvec) = (yyvsp[0].exprvec);
 #endif
 }
 #line 1801 "parser.cpp" /* yacc.c:1646  */
@@ -1804,7 +1804,7 @@ else yyerror("multiple definition of finish");
 #line 328 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.expr) = new NFuncCall(*(yyvsp[-1].ident), *(yyvsp[0].ExpressionList));
+(yyval.expr) = new NFuncCall(*(yyvsp[-1].ident), *(yyvsp[0].exprvec));
 #endif
 }
 #line 1811 "parser.cpp" /* yacc.c:1646  */
@@ -1814,7 +1814,7 @@ else yyerror("multiple definition of finish");
 #line 348 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[-1].ExpressionList)->push_back((yyvsp[-2].expr)); (yyval.ExpressionList) = (yyvsp[-1].ExpressionList);
+(yyvsp[-1].exprvec)->push_back((yyvsp[-2].expr)); (yyval.exprvec) = (yyvsp[-1].exprvec);
 #endif
 }
 #line 1821 "parser.cpp" /* yacc.c:1646  */
@@ -1834,7 +1834,7 @@ else yyerror("multiple definition of finish");
 #line 363 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.ExpressionList) = new ExpressionList();
+(yyval.exprvec) = new ExpressionList();
 #endif
 }
 #line 1841 "parser.cpp" /* yacc.c:1646  */
@@ -1844,7 +1844,7 @@ else yyerror("multiple definition of finish");
 #line 368 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].ExpressionList)->push_back((yyvsp[-1].expr)); (yyval.ExpressionList) = (yyvsp[0].ExpressionList);
+(yyvsp[0].exprvec)->push_back((yyvsp[-1].expr)); (yyval.exprvec) = (yyvsp[0].exprvec);
 #endif
 }
 #line 1851 "parser.cpp" /* yacc.c:1646  */
@@ -2024,7 +2024,7 @@ else yyerror("multiple definition of finish");
 #line 492 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].IdentifierList)->push_back((yyvsp[-1].ident)); (yyval.stmt) = new NReturn(*(yyvsp[0].IdentifierList));
+(yyvsp[0].identvec)->push_back((yyvsp[-1].ident)); (yyval.stmt) = new NReturn(*(yyvsp[0].identvec));
 #endif
 }
 #line 2031 "parser.cpp" /* yacc.c:1646  */
@@ -2034,7 +2034,7 @@ else yyerror("multiple definition of finish");
 #line 499 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.IdentifierList) = new IdentifierList();
+(yyval.identvec) = new IdentifierList();
 #endif
 }
 #line 2041 "parser.cpp" /* yacc.c:1646  */
@@ -2044,7 +2044,7 @@ else yyerror("multiple definition of finish");
 #line 504 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyvsp[0].IdentifierList)->push_back((yyvsp[-1].ident)); (yyval.IdentifierList) = (yyvsp[0].IdentifierList);
+(yyvsp[0].identvec).push_back((yyvsp[-1].ident)); (yyval.identvec) = (yyvsp[0].identvec);
 #endif
 }
 #line 2051 "parser.cpp" /* yacc.c:1646  */

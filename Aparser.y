@@ -58,10 +58,10 @@ long lval;
 	NIdentifier *ident;
 	std::vector<TsDecl*> TsDeclList;
 	//std::vector<ExprBlock*> ExprBlockList;
-	std::vector<NIdentifier*> IdentifierList;
-	std::vector<NStatement*> StatementList;
-	std::vector<NExpression*> ExpressionList;
-	std::vector<NVarDecl*> VariableList;
+	std::vector<NIdentifier*> identvec;
+//	std::vector<NStatement*> stmtvec;
+	std::vector<NExpression*> exprvec;
+	std::vector<NVarDecl*> varvec;
 
 	std::string *string;
 	int token;
@@ -94,19 +94,19 @@ long lval;
 %type <TsDeclList> ts_dcl 
 %type <TsDeclList> ts_dcl1
 %type <stmt> func_dcl 
-%type <VariableList> func_dcl1
+%type <varvec> func_dcl1
 %type <block> block //block_0
 %type <stmt> return_stmt
 %type <stmt> cond_stmt cond_stmt1 cond_stmt2
 %type <stmt> loop_stmt 
 %type <expr> loop_stmt1 loop_stmt2
-%type <IdentifierList> id1
+%type <identvec> id1
 %type <expr> expr
-%type <ExpressionList> expr1
+%type <exprvec> expr1
 %type <stmt> statement
 %type <stmt> assignment
 %type <expr> func_call func_param1
-%type <ExpressionList> func_param func_param2
+%type <exprvec> func_param func_param2
 %type <token> bin_op
 %type <token> arithmetic
 %type <token> conditional
@@ -503,7 +503,7 @@ $$ = new IdentifierList();
 }
 	| COMMA id id1						{
 #if TEST_MODE > TEST_PARSER
-$3->push_back($2); $$ = $3;
+$3.push_back($2); $$ = $3;
 #endif
 }
 ;
