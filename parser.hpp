@@ -113,7 +113,6 @@ union YYSTYPE
 {
 #line 52 "Aparser.y" /* yacc.c:1909  */
 
-public:
 #if TEST_MODE > TEST_PARSER
 	Node *node;
 	NBlock *block;
@@ -121,6 +120,7 @@ public:
 	NStatement *stmt;
 	NVarDecl* var;
 	NIdentifier *ident;
+	NInteger *intt;
 	NIf *iff;
 	NFor *forr;
 	NCase *casee;
@@ -143,12 +143,17 @@ public:
 #define	stmtvec test
 #define	exprvec test
 #define	varvec test
+#define	intt test
+#define	forr test
+#define	casee test
+#define	whilee test
+#define	iff test
 
 #endif
 	std::string *str;
 	int token;
 
-#line 152 "parser.hpp" /* yacc.c:1909  */
+#line 157 "parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

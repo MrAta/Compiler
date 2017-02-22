@@ -87,65 +87,64 @@ Grammar
    53           | RANGE loop_stmt2
    54           | RANGE loop_stmt2 TO loop_stmt2
 
-   55 loop_stmt2: %empty
-   56           | const_int
-   57           | id
+   55 loop_stmt2: const_int
+   56           | id
 
-   58 return_stmt: RETURN
-   59            | RETURN id id1
+   57 return_stmt: RETURN
+   58            | RETURN id id1
 
-   60 id1: %empty
-   61    | COMMA id id1
+   59 id1: %empty
+   60    | COMMA id id1
 
-   62 expr: LPAREN expr RPAREN
-   63     | expr bin_op expr
-   64     | func_call
-   65     | id
-   66     | id LBRACK expr RBRACK
-   67     | const_val
-   68     | MINUS expr
-   69     | NOT expr
-   70     | COMP expr
+   61 expr: LPAREN expr RPAREN
+   62     | expr bin_op expr
+   63     | func_call
+   64     | id
+   65     | id LBRACK expr RBRACK
+   66     | const_val
+   67     | MINUS expr
+   68     | NOT expr
+   69     | COMP expr
 
-   71 bin_op: arithmetic
-   72       | conditional
+   70 bin_op: arithmetic
+   71       | conditional
 
-   73 arithmetic: PLUS
-   74           | MINUS
-   75           | MULT
-   76           | DIV
-   77           | MOD
-   78           | AND
-   79           | OR
-   80           | XOR
-   81           | OROR
-   82           | ANDAND
+   72 arithmetic: PLUS
+   73           | MINUS
+   74           | MULT
+   75           | DIV
+   76           | MOD
+   77           | AND
+   78           | OR
+   79           | XOR
+   80           | OROR
+   81           | ANDAND
 
-   83 conditional: EQEQ
-   84            | NOTEQ
-   85            | GTEQ
-   86            | LTEQ
-   87            | LT
-   88            | GT
+   82 conditional: EQEQ
+   83            | NOTEQ
+   84            | GTEQ
+   85            | LTEQ
+   86            | LT
+   87            | GT
 
-   89 const_val: const_int
-   90          | CONST_REAL
-   91          | CONST_CHAR
-   92          | TRUE
-   93          | FALSE
-   94          | CONST_STRING
-   95          | CONST_LONG
+   88 const_val: const_int
+   89          | CONST_REAL
+   90          | CONST_CHAR
+   91          | TRUE
+   92          | FALSE
+   93          | CONST_STRING
+   94          | CONST_LONG
 
-   96 type: BOOL
-   97     | INT
-   98     | LONG
-   99     | CHAR
-  100     | REAL
-  101     | STRING
+   95 type: BOOL
+   96     | INT
+   97     | LONG
+   98     | CHAR
+   99     | REAL
+  100     | STRING
 
-  102 const_int: CONST_INT
+  101 const_int: CONST_INT
 
-  103 id: ID
+  102 id: ID
 
 
 Terminals, with rules where they appear
@@ -154,8 +153,8 @@ $end (0) 0
 error (256)
 INDENT (258) 14 15 16 17 41 42 43 44 46 48 49 50
 UNINDENT (259) 14 15 16 17 41 42 43 44 46 48 49 50
-LBRACK (260) 9 10 31 66
-RBRACK (261) 9 10 31 66
+LBRACK (260) 9 10 31 65
+RBRACK (261) 9 10 31 65
 START (262) 6
 FINISH (263) 7
 WHILE (264) 50
@@ -170,46 +169,46 @@ ELSE (272) 42
 ELIF (273) 46
 CASE (274) 43 44
 DEFAULT (275) 44
-RETURN (276) 58 59
+RETURN (276) 57 58
 COLON (277) 14 15 16 17 41 42 43 44 46 48 49 50
-NOT (278) 69
-COMMA (279) 12 13 19 34 40 61
+NOT (278) 68
+COMMA (279) 12 13 19 34 40 60
 EQ (280) 30 31 32
-OROR (281) 81
-ANDAND (282) 82
-OR (283) 79
-XOR (284) 80
-AND (285) 78
-EQEQ (286) 83
-NOTEQ (287) 84
-LT (288) 10 12 87
-LTEQ (289) 86
-GT (290) 10 12 88
-GTEQ (291) 85
-PLUS (292) 73
-MINUS (293) 68 74
-MULT (294) 75
-DIV (295) 76
-MOD (296) 77
+OROR (281) 80
+ANDAND (282) 81
+OR (283) 78
+XOR (284) 79
+AND (285) 77
+EQEQ (286) 82
+NOTEQ (287) 83
+LT (288) 10 12 86
+LTEQ (289) 85
+GT (290) 10 12 87
+GTEQ (291) 84
+PLUS (292) 72
+MINUS (293) 67 73
+MULT (294) 74
+DIV (295) 75
+MOD (296) 76
 SIZEOF (297)
 NEG (298)
-COMP (299) 70
-LPAREN (300) 36 62
-RPAREN (301) 36 62
-BOOL (302) 96
-INT (303) 97
-LONG (304) 98
-CHAR (305) 99
-REAL (306) 100
-STRING (307) 101
-ID (308) 103
-CONST_INT (309) 102
-CONST_REAL (310) 90
-CONST_CHAR (311) 91
-CONST_STRING (312) 94
-CONST_LONG (313) 95
-TRUE (314) 92
-FALSE (315) 93
+COMP (299) 69
+LPAREN (300) 36 61
+RPAREN (301) 36 61
+BOOL (302) 95
+INT (303) 96
+LONG (304) 97
+CHAR (305) 98
+REAL (306) 99
+STRING (307) 100
+ID (308) 102
+CONST_INT (309) 101
+CONST_REAL (310) 89
+CONST_CHAR (311) 90
+CONST_STRING (312) 93
+CONST_LONG (313) 94
+TRUE (314) 91
+FALSE (315) 92
 
 
 Nonterminals, with rules where they appear
@@ -242,7 +241,7 @@ assignment (72)
 expr1 (73)
     on left: 33 34, on right: 30 31 32 34
 func_call (74)
-    on left: 35, on right: 24 64
+    on left: 35, on right: 24 63
 func_param (75)
     on left: 36, on right: 35
 func_param1 (76)
@@ -260,29 +259,29 @@ loop_stmt (81)
 loop_stmt1 (82)
     on left: 51 52 53 54, on right: 49
 loop_stmt2 (83)
-    on left: 55 56 57, on right: 53 54
+    on left: 55 56, on right: 53 54
 return_stmt (84)
-    on left: 58 59, on right: 27
+    on left: 57 58, on right: 27
 id1 (85)
-    on left: 60 61, on right: 59 61
+    on left: 59 60, on right: 58 60
 expr (86)
-    on left: 62 63 64 65 66 67 68 69 70, on right: 30 31 32 34 38 41
-    42 43 44 46 50 62 63 66 68 69 70
+    on left: 61 62 63 64 65 66 67 68 69, on right: 30 31 32 34 38 41
+    42 43 44 46 50 61 62 65 67 68 69
 bin_op (87)
-    on left: 71 72, on right: 63
+    on left: 70 71, on right: 62
 arithmetic (88)
-    on left: 73 74 75 76 77 78 79 80 81 82, on right: 71
+    on left: 72 73 74 75 76 77 78 79 80 81, on right: 70
 conditional (89)
-    on left: 83 84 85 86 87 88, on right: 72
+    on left: 82 83 84 85 86 87, on right: 71
 const_val (90)
-    on left: 89 90 91 92 93 94 95, on right: 48 67
+    on left: 88 89 90 91 92 93 94, on right: 48 66
 type (91)
-    on left: 96 97 98 99 100 101, on right: 9 10 12 13
+    on left: 95 96 97 98 99 100, on right: 9 10 12 13
 const_int (92)
-    on left: 102, on right: 10 12 56 89
+    on left: 101, on right: 10 12 55 88
 id (93)
-    on left: 103, on right: 6 7 8 14 15 16 17 30 31 35 49 52 57 59
-    61 65 66
+    on left: 102, on right: 6 7 8 14 15 16 17 30 31 35 49 52 56 58
+    60 64 65
 
 
 State 0
@@ -340,9 +339,9 @@ State 3
 
 State 4
 
-  103 id: ID .
+  102 id: ID .
 
-    $default  reduce using rule 103 (id)
+    $default  reduce using rule 102 (id)
 
 
 State 5
@@ -459,44 +458,44 @@ State 11
 
 State 12
 
-   96 type: BOOL .
+   95 type: BOOL .
 
-    $default  reduce using rule 96 (type)
+    $default  reduce using rule 95 (type)
 
 
 State 13
 
-   97 type: INT .
+   96 type: INT .
 
-    $default  reduce using rule 97 (type)
+    $default  reduce using rule 96 (type)
 
 
 State 14
 
-   98 type: LONG .
+   97 type: LONG .
 
-    $default  reduce using rule 98 (type)
+    $default  reduce using rule 97 (type)
 
 
 State 15
 
-   99 type: CHAR .
+   98 type: CHAR .
 
-    $default  reduce using rule 99 (type)
+    $default  reduce using rule 98 (type)
 
 
 State 16
 
-  100 type: REAL .
+   99 type: REAL .
 
-    $default  reduce using rule 100 (type)
+    $default  reduce using rule 99 (type)
 
 
 State 17
 
-  101 type: STRING .
+  100 type: STRING .
 
-    $default  reduce using rule 101 (type)
+    $default  reduce using rule 100 (type)
 
 
 State 18
@@ -714,9 +713,9 @@ State 39
 
 State 40
 
-  102 const_int: CONST_INT .
+  101 const_int: CONST_INT .
 
-    $default  reduce using rule 102 (const_int)
+    $default  reduce using rule 101 (const_int)
 
 
 State 41
@@ -865,13 +864,13 @@ State 50
 
 State 51
 
-   58 return_stmt: RETURN .
-   59            | RETURN . id id1
+   57 return_stmt: RETURN .
+   58            | RETURN . id id1
 
     ID  shift, and go to state 4
 
-    ID        [reduce using rule 58 (return_stmt)]
-    $default  reduce using rule 58 (return_stmt)
+    ID        [reduce using rule 57 (return_stmt)]
+    $default  reduce using rule 57 (return_stmt)
 
     id  go to state 86
 
@@ -1048,7 +1047,7 @@ State 67
 
 State 68
 
-   69 expr: NOT . expr
+   68 expr: NOT . expr
 
     NOT           shift, and go to state 68
     MINUS         shift, and go to state 69
@@ -1072,7 +1071,7 @@ State 68
 
 State 69
 
-   68 expr: MINUS . expr
+   67 expr: MINUS . expr
 
     NOT           shift, and go to state 68
     MINUS         shift, and go to state 69
@@ -1096,7 +1095,7 @@ State 69
 
 State 70
 
-   70 expr: COMP . expr
+   69 expr: COMP . expr
 
     NOT           shift, and go to state 68
     MINUS         shift, and go to state 69
@@ -1120,7 +1119,7 @@ State 70
 
 State 71
 
-   62 expr: LPAREN . expr RPAREN
+   61 expr: LPAREN . expr RPAREN
 
     NOT           shift, and go to state 68
     MINUS         shift, and go to state 69
@@ -1144,57 +1143,57 @@ State 71
 
 State 72
 
-   90 const_val: CONST_REAL .
+   89 const_val: CONST_REAL .
 
-    $default  reduce using rule 90 (const_val)
+    $default  reduce using rule 89 (const_val)
 
 
 State 73
 
-   91 const_val: CONST_CHAR .
+   90 const_val: CONST_CHAR .
 
-    $default  reduce using rule 91 (const_val)
+    $default  reduce using rule 90 (const_val)
 
 
 State 74
 
-   94 const_val: CONST_STRING .
-
-    $default  reduce using rule 94 (const_val)
-
-
-State 75
-
-   95 const_val: CONST_LONG .
-
-    $default  reduce using rule 95 (const_val)
-
-
-State 76
-
-   92 const_val: TRUE .
-
-    $default  reduce using rule 92 (const_val)
-
-
-State 77
-
-   93 const_val: FALSE .
+   93 const_val: CONST_STRING .
 
     $default  reduce using rule 93 (const_val)
 
 
+State 75
+
+   94 const_val: CONST_LONG .
+
+    $default  reduce using rule 94 (const_val)
+
+
+State 76
+
+   91 const_val: TRUE .
+
+    $default  reduce using rule 91 (const_val)
+
+
+State 77
+
+   92 const_val: FALSE .
+
+    $default  reduce using rule 92 (const_val)
+
+
 State 78
 
-   64 expr: func_call .
+   63 expr: func_call .
 
-    $default  reduce using rule 64 (expr)
+    $default  reduce using rule 63 (expr)
 
 
 State 79
 
    50 loop_stmt: WHILE expr . COLON INDENT block UNINDENT
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COLON   shift, and go to state 105
     OROR    shift, and go to state 106
@@ -1221,28 +1220,28 @@ State 79
 
 State 80
 
-   67 expr: const_val .
+   66 expr: const_val .
 
-    $default  reduce using rule 67 (expr)
+    $default  reduce using rule 66 (expr)
 
 
 State 81
 
-   89 const_val: const_int .
+   88 const_val: const_int .
 
-    $default  reduce using rule 89 (const_val)
+    $default  reduce using rule 88 (const_val)
 
 
 State 82
 
    35 func_call: id . func_param
-   65 expr: id .
-   66     | id . LBRACK expr RBRACK
+   64 expr: id .
+   65     | id . LBRACK expr RBRACK
 
     LBRACK  shift, and go to state 125
     LPAREN  shift, and go to state 93
 
-    $default  reduce using rule 65 (expr)
+    $default  reduce using rule 64 (expr)
 
     func_param  go to state 94
 
@@ -1258,7 +1257,7 @@ State 84
 
    41 cond_stmt: IF expr . COLON INDENT block UNINDENT cond_stmt1
    42          | IF expr . COLON INDENT block UNINDENT cond_stmt1 ELSE COLON INDENT block UNINDENT
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COLON   shift, and go to state 127
     OROR    shift, and go to state 106
@@ -1287,7 +1286,7 @@ State 85
 
    43 cond_stmt: CASE expr . COLON INDENT cond_stmt2 UNINDENT
    44          | CASE expr . COLON INDENT cond_stmt2 DEFAULT COLON INDENT block UNINDENT UNINDENT
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COLON   shift, and go to state 128
     OROR    shift, and go to state 106
@@ -1314,11 +1313,11 @@ State 85
 
 State 86
 
-   59 return_stmt: RETURN id . id1
+   58 return_stmt: RETURN id . id1
 
     COMMA  shift, and go to state 129
 
-    $default  reduce using rule 60 (id1)
+    $default  reduce using rule 59 (id1)
 
     id1  go to state 130
 
@@ -1541,24 +1540,8 @@ State 100
 
 State 101
 
-   63 expr: expr . bin_op expr
-   69     | NOT expr .
-
-    $default  reduce using rule 69 (expr)
-
-    bin_op       go to state 122
-    arithmetic   go to state 123
-    conditional  go to state 124
-
-
-State 102
-
-   63 expr: expr . bin_op expr
-   68     | MINUS expr .
-
-    MULT  shift, and go to state 119
-    DIV   shift, and go to state 120
-    MOD   shift, and go to state 121
+   62 expr: expr . bin_op expr
+   68     | NOT expr .
 
     $default  reduce using rule 68 (expr)
 
@@ -1567,12 +1550,28 @@ State 102
     conditional  go to state 124
 
 
+State 102
+
+   62 expr: expr . bin_op expr
+   67     | MINUS expr .
+
+    MULT  shift, and go to state 119
+    DIV   shift, and go to state 120
+    MOD   shift, and go to state 121
+
+    $default  reduce using rule 67 (expr)
+
+    bin_op       go to state 122
+    arithmetic   go to state 123
+    conditional  go to state 124
+
+
 State 103
 
-   63 expr: expr . bin_op expr
-   70     | COMP expr .
+   62 expr: expr . bin_op expr
+   69     | COMP expr .
 
-    $default  reduce using rule 70 (expr)
+    $default  reduce using rule 69 (expr)
 
     bin_op       go to state 122
     arithmetic   go to state 123
@@ -1581,8 +1580,8 @@ State 103
 
 State 104
 
-   62 expr: LPAREN expr . RPAREN
-   63     | expr . bin_op expr
+   61 expr: LPAREN expr . RPAREN
+   62     | expr . bin_op expr
 
     OROR    shift, and go to state 106
     ANDAND  shift, and go to state 107
@@ -1616,119 +1615,119 @@ State 105
 
 State 106
 
-   81 arithmetic: OROR .
-
-    $default  reduce using rule 81 (arithmetic)
-
-
-State 107
-
-   82 arithmetic: ANDAND .
-
-    $default  reduce using rule 82 (arithmetic)
-
-
-State 108
-
-   79 arithmetic: OR .
-
-    $default  reduce using rule 79 (arithmetic)
-
-
-State 109
-
-   80 arithmetic: XOR .
+   80 arithmetic: OROR .
 
     $default  reduce using rule 80 (arithmetic)
 
 
-State 110
+State 107
 
-   78 arithmetic: AND .
+   81 arithmetic: ANDAND .
+
+    $default  reduce using rule 81 (arithmetic)
+
+
+State 108
+
+   78 arithmetic: OR .
 
     $default  reduce using rule 78 (arithmetic)
 
 
-State 111
+State 109
 
-   83 conditional: EQEQ .
+   79 arithmetic: XOR .
 
-    $default  reduce using rule 83 (conditional)
-
-
-State 112
-
-   84 conditional: NOTEQ .
-
-    $default  reduce using rule 84 (conditional)
+    $default  reduce using rule 79 (arithmetic)
 
 
-State 113
+State 110
 
-   87 conditional: LT .
-
-    $default  reduce using rule 87 (conditional)
-
-
-State 114
-
-   86 conditional: LTEQ .
-
-    $default  reduce using rule 86 (conditional)
-
-
-State 115
-
-   88 conditional: GT .
-
-    $default  reduce using rule 88 (conditional)
-
-
-State 116
-
-   85 conditional: GTEQ .
-
-    $default  reduce using rule 85 (conditional)
-
-
-State 117
-
-   73 arithmetic: PLUS .
-
-    $default  reduce using rule 73 (arithmetic)
-
-
-State 118
-
-   74 arithmetic: MINUS .
-
-    $default  reduce using rule 74 (arithmetic)
-
-
-State 119
-
-   75 arithmetic: MULT .
-
-    $default  reduce using rule 75 (arithmetic)
-
-
-State 120
-
-   76 arithmetic: DIV .
-
-    $default  reduce using rule 76 (arithmetic)
-
-
-State 121
-
-   77 arithmetic: MOD .
+   77 arithmetic: AND .
 
     $default  reduce using rule 77 (arithmetic)
 
 
+State 111
+
+   82 conditional: EQEQ .
+
+    $default  reduce using rule 82 (conditional)
+
+
+State 112
+
+   83 conditional: NOTEQ .
+
+    $default  reduce using rule 83 (conditional)
+
+
+State 113
+
+   86 conditional: LT .
+
+    $default  reduce using rule 86 (conditional)
+
+
+State 114
+
+   85 conditional: LTEQ .
+
+    $default  reduce using rule 85 (conditional)
+
+
+State 115
+
+   87 conditional: GT .
+
+    $default  reduce using rule 87 (conditional)
+
+
+State 116
+
+   84 conditional: GTEQ .
+
+    $default  reduce using rule 84 (conditional)
+
+
+State 117
+
+   72 arithmetic: PLUS .
+
+    $default  reduce using rule 72 (arithmetic)
+
+
+State 118
+
+   73 arithmetic: MINUS .
+
+    $default  reduce using rule 73 (arithmetic)
+
+
+State 119
+
+   74 arithmetic: MULT .
+
+    $default  reduce using rule 74 (arithmetic)
+
+
+State 120
+
+   75 arithmetic: DIV .
+
+    $default  reduce using rule 75 (arithmetic)
+
+
+State 121
+
+   76 arithmetic: MOD .
+
+    $default  reduce using rule 76 (arithmetic)
+
+
 State 122
 
-   63 expr: expr bin_op . expr
+   62 expr: expr bin_op . expr
 
     NOT           shift, and go to state 68
     MINUS         shift, and go to state 69
@@ -1752,21 +1751,21 @@ State 122
 
 State 123
 
-   71 bin_op: arithmetic .
+   70 bin_op: arithmetic .
 
-    $default  reduce using rule 71 (bin_op)
+    $default  reduce using rule 70 (bin_op)
 
 
 State 124
 
-   72 bin_op: conditional .
+   71 bin_op: conditional .
 
-    $default  reduce using rule 72 (bin_op)
+    $default  reduce using rule 71 (bin_op)
 
 
 State 125
 
-   66 expr: id LBRACK . expr RBRACK
+   65 expr: id LBRACK . expr RBRACK
 
     NOT           shift, and go to state 68
     MINUS         shift, and go to state 69
@@ -1819,7 +1818,7 @@ State 128
 
 State 129
 
-   61 id1: COMMA . id id1
+   60 id1: COMMA . id id1
 
     ID  shift, and go to state 4
 
@@ -1828,15 +1827,15 @@ State 129
 
 State 130
 
-   59 return_stmt: RETURN id id1 .
+   58 return_stmt: RETURN id id1 .
 
-    $default  reduce using rule 59 (return_stmt)
+    $default  reduce using rule 58 (return_stmt)
 
 
 State 131
 
    32 assignment: var_dcl EQ expr . expr1
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COMMA   shift, and go to state 150
     OROR    shift, and go to state 106
@@ -1867,7 +1866,7 @@ State 131
 State 132
 
    31 assignment: id LBRACK expr . expr1 RBRACK EQ expr expr1
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COMMA   shift, and go to state 150
     OROR    shift, and go to state 106
@@ -1898,7 +1897,7 @@ State 132
 State 133
 
    30 assignment: id EQ expr . expr1
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COMMA   shift, and go to state 150
     OROR    shift, and go to state 106
@@ -1940,7 +1939,7 @@ State 134
 State 135
 
    38 func_param1: expr .
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     OROR    shift, and go to state 106
     ANDAND  shift, and go to state 107
@@ -2000,9 +1999,9 @@ State 139
 
 State 140
 
-   62 expr: LPAREN expr RPAREN .
+   61 expr: LPAREN expr RPAREN .
 
-    $default  reduce using rule 62 (expr)
+    $default  reduce using rule 61 (expr)
 
 
 State 141
@@ -2033,8 +2032,8 @@ State 141
 
 State 142
 
-   63 expr: expr . bin_op expr
-   63     | expr bin_op expr .
+   62 expr: expr . bin_op expr
+   62     | expr bin_op expr .
 
     OROR    shift, and go to state 106
     ANDAND  shift, and go to state 107
@@ -2053,23 +2052,23 @@ State 142
     DIV     shift, and go to state 120
     MOD     shift, and go to state 121
 
-    OROR      [reduce using rule 63 (expr)]
-    ANDAND    [reduce using rule 63 (expr)]
-    OR        [reduce using rule 63 (expr)]
-    XOR       [reduce using rule 63 (expr)]
-    AND       [reduce using rule 63 (expr)]
-    EQEQ      [reduce using rule 63 (expr)]
-    NOTEQ     [reduce using rule 63 (expr)]
-    LT        [reduce using rule 63 (expr)]
-    LTEQ      [reduce using rule 63 (expr)]
-    GT        [reduce using rule 63 (expr)]
-    GTEQ      [reduce using rule 63 (expr)]
-    PLUS      [reduce using rule 63 (expr)]
-    MINUS     [reduce using rule 63 (expr)]
-    MULT      [reduce using rule 63 (expr)]
-    DIV       [reduce using rule 63 (expr)]
-    MOD       [reduce using rule 63 (expr)]
-    $default  reduce using rule 63 (expr)
+    OROR      [reduce using rule 62 (expr)]
+    ANDAND    [reduce using rule 62 (expr)]
+    OR        [reduce using rule 62 (expr)]
+    XOR       [reduce using rule 62 (expr)]
+    AND       [reduce using rule 62 (expr)]
+    EQEQ      [reduce using rule 62 (expr)]
+    NOTEQ     [reduce using rule 62 (expr)]
+    LT        [reduce using rule 62 (expr)]
+    LTEQ      [reduce using rule 62 (expr)]
+    GT        [reduce using rule 62 (expr)]
+    GTEQ      [reduce using rule 62 (expr)]
+    PLUS      [reduce using rule 62 (expr)]
+    MINUS     [reduce using rule 62 (expr)]
+    MULT      [reduce using rule 62 (expr)]
+    DIV       [reduce using rule 62 (expr)]
+    MOD       [reduce using rule 62 (expr)]
+    $default  reduce using rule 62 (expr)
 
     bin_op       go to state 122
     arithmetic   go to state 123
@@ -2078,8 +2077,8 @@ State 142
 
 State 143
 
-   63 expr: expr . bin_op expr
-   66     | id LBRACK expr . RBRACK
+   62 expr: expr . bin_op expr
+   65     | id LBRACK expr . RBRACK
 
     RBRACK  shift, and go to state 160
     OROR    shift, and go to state 106
@@ -2111,8 +2110,6 @@ State 144
 
     ID         shift, and go to state 4
     CONST_INT  shift, and go to state 40
-
-    $default  reduce using rule 55 (loop_stmt2)
 
     loop_stmt2  go to state 161
     const_int   go to state 162
@@ -2182,11 +2179,11 @@ State 148
 
 State 149
 
-   61 id1: COMMA id . id1
+   60 id1: COMMA id . id1
 
     COMMA  shift, and go to state 129
 
-    $default  reduce using rule 60 (id1)
+    $default  reduce using rule 59 (id1)
 
     id1  go to state 168
 
@@ -2300,9 +2297,9 @@ State 159
 
 State 160
 
-   66 expr: id LBRACK expr RBRACK .
+   65 expr: id LBRACK expr RBRACK .
 
-    $default  reduce using rule 66 (expr)
+    $default  reduce using rule 65 (expr)
 
 
 State 161
@@ -2317,16 +2314,16 @@ State 161
 
 State 162
 
-   56 loop_stmt2: const_int .
+   55 loop_stmt2: const_int .
 
-    $default  reduce using rule 56 (loop_stmt2)
+    $default  reduce using rule 55 (loop_stmt2)
 
 
 State 163
 
-   57 loop_stmt2: id .
+   56 loop_stmt2: id .
 
-    $default  reduce using rule 57 (loop_stmt2)
+    $default  reduce using rule 56 (loop_stmt2)
 
 
 State 164
@@ -2362,15 +2359,15 @@ State 167
 
 State 168
 
-   61 id1: COMMA id id1 .
+   60 id1: COMMA id id1 .
 
-    $default  reduce using rule 61 (id1)
+    $default  reduce using rule 60 (id1)
 
 
 State 169
 
    34 expr1: COMMA expr . expr1
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COMMA   shift, and go to state 150
     OROR    shift, and go to state 106
@@ -2436,8 +2433,6 @@ State 174
 
     ID         shift, and go to state 4
     CONST_INT  shift, and go to state 40
-
-    $default  reduce using rule 55 (loop_stmt2)
 
     loop_stmt2  go to state 183
     const_int   go to state 162
@@ -2625,7 +2620,7 @@ State 188
 State 189
 
    31 assignment: id LBRACK expr expr1 RBRACK EQ expr . expr1
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COMMA   shift, and go to state 150
     OROR    shift, and go to state 106
@@ -2663,7 +2658,7 @@ State 190
 State 191
 
    46 cond_stmt1: ELIF expr . COLON INDENT block UNINDENT cond_stmt1
-   63 expr: expr . bin_op expr
+   62 expr: expr . bin_op expr
 
     COLON   shift, and go to state 196
     OROR    shift, and go to state 106

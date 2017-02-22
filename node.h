@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
+#if TEST_MODE > TEST_AST_GEN
 #include <llvm/IR/Value.h>
+#endif
 
 class CodeGenContext;
 class NExpression;
@@ -11,21 +13,21 @@ class NBlock;
 class NStatement;
 class NInteger;
 
-struct TsDecl
-{
+class TsDecl {
+public:
 	int type;
-	NInteger& num;
-	TsDecl( int type, NInteger& num ) :
-		type(type), num(num) { }
+	int size;
+	TsDecl( int type, int size ) :
+		type(type), size(size) { }
 };
 
-struct ExprBlock
-{
-	NBlock& b;
-	NExpression& e;
+class ExprBlock {
+public:
+	NBlock* b;
+	NExpression* e;
 
-    ExprBlock(NBlock& b, NExpression& e)
-    : b(b), e(e) {}
+	ExprBlock(NExpression* e, NBlock* b) :
+		b(b), e(e) {}
 };
 
 /*
@@ -35,7 +37,6 @@ ExprBlockList ebl
 ebl.emplace_back(b, e);
 */
 
-//typedef std::vector<NDecl*> NDeclList;
 typedef std::vector<TsDecl*> TsDeclList;
 typedef std::vector<ExprBlock*> ExprBlockList;
 typedef std::vector<NIdentifier*> IdentifierList;
@@ -46,7 +47,9 @@ typedef std::vector<NVarDecl*> VariableList;
 class Node {
 public:
 	virtual ~Node() {}
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context) { return NULL; }
+#endif
 };
 
 //****************************************************************************************************
@@ -61,46 +64,27 @@ class NContinue : public NStatement {
 };
 
 //****************************************************************************************************
-/*
-class NAssignment1 : public NStatement {
-public:
-	NIdentifier& id;
-	ExpressionList& rhs;
-	NAssignment(NIdentifier& id, ExpressionList& rhs) : 
-		id(id), rhs(rhs) {  }
-	virtual llvm::Value* codeGen(CodeGenContext& context);
-};
 
-class NAssignment2 : public NStatement {
-public:
-	int type;
-	NIdentifier& id;
-	NExpression& lhs;
-	NExpression& rhs;
-	NVarDecl& vd;
-	NAssignment(NIdentifier& id, NExpression& rhs) : 
-		id(id), rhs(rhs) { type = 1; }
-	NAssignment(NVarDecl& vd, NExpression& rhs) : 
-		vd(vd), rhs(rhs) { type = 2; }
-	NAssignment(NIdentifier& id, NExpression& lhs, NExpression& rhs) : 
-		id(id), lhs(lhs), rhs(rhs) { type = 3; }
-	virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-*/
 class NAssignment : public NStatement {
 public:
 	int type;
-	NIdentifier* id;
-	NExpression* lhs;
-	NExpression& rhs;
-	NVarDecl* vd;
-	NAssignment(NIdentifier* id, NExpression& rhs) : 
+	NIdentifier *id;
+	ExpressionList *lhs;
+	ExpressionList rhs;
+	NVarDecl *vd;
+	NAssignment(NIdentifier *id, ExpressionList& rhs) : 
 		id(id), rhs(rhs) { lhs = NULL; vd = NULL; type = 1; }
-	NAssignment(NVarDecl* vd, NExpression& rhs) : 
+	NAssignment(NVarDecl *vd, ExpressionList& rhs) : 
 		vd(vd), rhs(rhs) { lhs = NULL; id = NULL; type = 2; }
-	NAssignment(NIdentifier* id, NExpression* lhs, NExpression& rhs) : 
+	NAssignment(NIdentifier *id, ExpressionList *lhs, ExpressionList& rhs) : 
 		id(id), lhs(lhs), rhs(rhs) { vd = NULL; type = 3; }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NAssignment" << std::endl;
+	}
+#endif
 };
 
 class NReturn : public NStatement {
@@ -108,7 +92,13 @@ public:
 	IdentifierList idl;
 	NReturn(IdentifierList& idl) : 
 		idl(idl) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NReturn" << std::endl;
+	}
+#endif
 };
 
 class NWhile : public NStatement {
@@ -117,24 +107,44 @@ public:
 	NBlock& b;
 	NWhile(NExpression& e, NBlock& b) :
 		e(e), b(b) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NWhile" << std::endl;
+	}
+#endif
 };
 
 class NFor : public NStatement {
 public:
-	NIdentifier& id;
-	NExpression& e;
-	NBlock& b;
-	NFor(NIdentifier& id, NExpression& e, NBlock& b) :
-		id(id), e(e), b(b) { }
+	int type;
+	NIdentifier* id;
+	NExpression* range;
+	NExpression* to;
+	NBlock* block;
+	NFor(NExpression *range, NExpression *to, int type) :
+		range(range), to(to), type(type) { block = NULL; id = NULL; }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NFor" << std::endl;
+	}
+#endif
 };
 
 class NIf : public NStatement {
 public:
 	ExprBlockList ebl;
 	NIf() { /*ebl = new ExprBlockList();*/ }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NIf" << std::endl;
+	}
+#endif
 };
 
 class NCase : public NStatement {
@@ -142,7 +152,13 @@ public:
 	ExprBlockList ebl;
 	NExpression* Expression;
 	NCase() { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NCase" << std::endl;
+	}
+#endif
 };
 
 //****************************************************************************************************
@@ -156,7 +172,13 @@ public:
 	int op;
 	NUnaryOp(int op, NExpression& e) :
 		e(e), op(op) {  }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NUnaryOp" << std::endl;
+	}
+#endif
 };
 
 class NBineryOp : public NExpression {
@@ -166,7 +188,13 @@ public:
 	int op;
 	NBineryOp(NExpression& lhs, int op, NExpression& rhs) :
 		lhs(lhs), rhs(rhs), op(op) {  }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NBineryOp" << std::endl;
+	}
+#endif
 };
 
 class NArrayExpr : public NExpression {
@@ -175,7 +203,13 @@ public:
 	NIdentifier& id;
 	NArrayExpr(NIdentifier& id, NExpression& index) :
 		index(index), id(id) {  }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NArrayExpr" << std::endl;
+	}
+#endif
 };
 
 class NFuncCall : public NExpression/*, public NStatement*/ {
@@ -185,7 +219,13 @@ public:
 	NFuncCall(NIdentifier& id, ExpressionList& arguments) :
 		id(id), arguments(arguments) { }
 	//NFuncCall(const NIdentifier& id) : id(id) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NFuncCall" << std::endl;
+	}
+#endif
 };
 
 class NBlank : public NExpression {
@@ -195,49 +235,91 @@ class NInteger : public NExpression {
 public:
 	long value;
 	NInteger(int value) : value(value) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NInteger" << std::endl;
+	}
+#endif
 };
 
 class NLong : public NExpression {
 public:
 	long value;
 	NLong(long value) : value(value) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NLong" << std::endl;
+	}
+#endif
 };
 
 class NReal : public NExpression {
 public:
 	double value;
 	NReal(double value) : value(value) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NReal" << std::endl;
+	}
+#endif
 };
 
 class NChar : public NExpression {
 public:
 	char value;
 	NChar(char value) : value(value) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NChar" << std::endl;
+	}
+#endif
 };
 
 class NBool : public NExpression {
 public:
 	bool value;
 	NBool(bool value) : value(value) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NBool" << std::endl;
+	}
+#endif
 };
 
 class NString : public NExpression {
 public:
 	std::string value;
 	NString(std::string& value) : value(value) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NString" << std::endl;
+	}
+#endif
 };
 
 class NIdentifier : public NExpression {
 public:
 	std::string name;
 	NIdentifier(std::string& name) : name(name) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NIdentifier" << std::endl;
+	}
+#endif
 };
 
 //****************************************************************************************************
@@ -248,7 +330,13 @@ class NBlock : public Node {
 public:
 	StatementList statements;
 	NBlock() { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NBlock" << std::endl;
+	}
+#endif
 };
 
 
@@ -271,7 +359,13 @@ public:
 	//NExpression *assignmentExpr;
 	NVarDecl(NIdentifier& id, TsDeclList& TsDecl) :
 		id(id), TsDecl(TsDecl) { /*assignmentExpr = NULL; */ }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NVarDecl" << std::endl;
+	}
+#endif
 };
 
 class NFunctionDecl : public NStatement {
@@ -282,7 +376,13 @@ public:
 	NBlock& block;
 	NFunctionDecl(TsDeclList& returns, NIdentifier& id, VariableList& arguments, NBlock& block) :
 		returns(returns), id(id), arguments(arguments), block(block) { }
+#if TEST_MODE > TEST_AST_GEN
 	virtual llvm::Value* codeGen(CodeGenContext& context);
+#else
+	void codeGen(){
+		std::cout << "NFunctionDecl" << std::endl;
+	}
+#endif
 };
 
 

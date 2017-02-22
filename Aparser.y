@@ -2,27 +2,27 @@
 
 #include "debug_mode.h"
 
-#if TEST_MODE > TEST_PARSER
+//#if TEST_MODE > TEST_PARSER
 #include "node.h"
 
-#define  PARSE(token) return token
+//#define  PARSE(token) return token
 
-#else
+//#else
 
 #define  PARSE(token) printf("%s\n", #token)
 
-#endif
+//#endif
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstdbool>
 #define YYDEBUG 1
 
-#if TEST_MODE > TEST_PARSER
+//#if TEST_MODE > TEST_PARSER
 NBlock *programBlock; /* the top level root node of our final AST */
 NIdentifier* start = NULL;
 NIdentifier* finish = NULL;
-#endif
+//#endif
 
  /*NProgram *program; /* the top level root node of our final AST */
 
@@ -50,7 +50,6 @@ long lval;
 
 
 %union {
-public:
 #if TEST_MODE > TEST_PARSER
 	Node *node;
 	NBlock *block;
@@ -58,6 +57,7 @@ public:
 	NStatement *stmt;
 	NVarDecl* var;
 	NIdentifier *ident;
+	NInteger *intt;
 	NIf *iff;
 	NFor *forr;
 	NCase *casee;
@@ -80,6 +80,11 @@ public:
 #define	stmtvec test
 #define	exprvec test
 #define	varvec test
+#define	intt test
+#define	forr test
+#define	casee test
+#define	whilee test
+#define	iff test
 
 #endif
 	std::string *str;
@@ -120,9 +125,9 @@ public:
 %type <iff> cond_stmt1
 %type <casee> cond_stmt2
 %type <stmt> loop_stmt 
-%type <expr> loop_stmt1 loop_stmt2
+%type <forr> loop_stmt1
+%type <expr> expr loop_stmt2
 %type <identvec> id1
-%type <expr> expr
 %type <exprvec> expr1
 %type <stmt> statement
 %type <stmt> assignment
@@ -131,7 +136,8 @@ public:
 %type <token> bin_op
 %type <token> arithmetic
 %type <token> conditional
-%type <expr> const_val const_int
+%type <expr> const_val 
+%type <intt> const_int
 %type <token> type
 %type <ident> id
 /*
@@ -216,14 +222,15 @@ $$ = new NVarDecl(*$1, *$2);
 ts_dcl : 
 	LBRACK type ts_dcl1 RBRACK				{ 
 #if TEST_MODE > TEST_PARSER
-$3->emplace_back($2, new NInteger(1)); $$ = $3;
-//$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
+//$3->emplace_back(new TsDecl($2, new NInteger(1))); 
+//$$ = $3;
+$3->push_back(new TsDecl($2, 1)); $$ = $3; 
 #endif
 }
 	| LBRACK type LT const_int GT ts_dcl1 RBRACK		{ 
 #if TEST_MODE > TEST_PARSER
-$6->emplace_back($2, *$4); $$ = $6;
-//$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
+//$6->emplace_back($2, *$4); $$ = $6;
+$6->push_back(new TsDecl($2, $4->value)); $$ = $6; 
 #endif
 }
 ;
@@ -234,14 +241,14 @@ $$ = new TsDeclList();
 }
 	| COMMA type LT const_int GT ts_dcl1			{
 #if TEST_MODE > TEST_PARSER
-$6->emplace_back($2, *$4); $$ = $6;
-//$6->push_back(new NTsDecl($2, *$4)); $$ = $6; 
+//$6->emplace_back($2, *$4); $$ = $6;
+$6->push_back(new TsDecl($2, $4->value)); $$ = $6; 
 #endif
 }
 	| COMMA type ts_dcl1					{
 #if TEST_MODE > TEST_PARSER
-$3->emplace_back($2, new NInteger(1)); $$ = $3;
-//$3->push_back(new NTsDecl($2, new NInteger(1)) ); $$ = $3; 
+//$3->emplace_back($2, new NInteger(1)); $$ = $3;
+$3->push_back(new TsDecl($2, 1)); $$ = $3; 
 #endif
 }
 ;
@@ -249,7 +256,7 @@ $3->emplace_back($2, new NInteger(1)); $$ = $3;
 func_dcl : 
 	  id COLON INDENT block UNINDENT				{
 #if TEST_MODE > TEST_PARSER
-$$ = new NFunctionDecl(new TsDeclList(), *$1, new VariableList(), *$4);
+$$ = new NFunctionDecl(*(new TsDeclList()), *$1, *(new VariableList()), *$4);
 #endif
 }
 	| ts_dcl id var_dcl func_dcl1 COLON INDENT block UNINDENT 	{
@@ -259,12 +266,12 @@ $4->push_back($3); $$ = new NFunctionDecl(*$1, *$2, *$4, *$7);
 }
 	| ts_dcl id COLON INDENT block UNINDENT				{
 #if TEST_MODE > TEST_PARSER
-$$ = new NFunctionDecl(*$1, *$2, new VariableList(), *$5);
+$$ = new NFunctionDecl(*$1, *$2, *(new VariableList()), *$5);
 #endif
 }
 	| id var_dcl func_dcl1 COLON INDENT block UNINDENT		{
 #if TEST_MODE > TEST_PARSER
-$3->push_back($2); $$ = new NFunctionDecl(new TsDeclList(), *$1, *$3, *$6);
+$3->push_back($2); $$ = new NFunctionDecl(*(new TsDeclList()), *$1, *$3, *$6);
 #endif
 }
 ;
@@ -319,17 +326,17 @@ $$ = new NContinue();
 assignment : 
 	  id EQ expr expr1					{
 #if TEST_MODE > TEST_PARSER
-$4->push_back($3); $$ = new NAssignment(*$1, *$4);
+$4->push_back($3); $$ = new NAssignment($1, *$4);
 #endif
 }
 	| id LBRACK expr expr1 RBRACK EQ expr expr1		{
 #if TEST_MODE > TEST_PARSER
-$4->push_back($3); $8->push_back($7); $$ = new NAssignment(*$1, *$4, *$8);
+$4->push_back($3); $8->push_back($7); $$ = new NAssignment($1, $4, *$8);
 #endif
 }
 	| var_dcl EQ expr expr1					{
 #if TEST_MODE > TEST_PARSER
-$4->push_back($3); $$ = new NAssignment(*$1, *$4);
+$4->push_back($3); $$ = new NAssignment($1, *$4);
 #endif
 }
 ;
@@ -396,27 +403,29 @@ $3->push_back($2); $$ = $3;
 cond_stmt : 
 	  IF expr COLON INDENT block UNINDENT cond_stmt1	{
 #if TEST_MODE > TEST_PARSER
-$7->ebl.emplace_back($2, $5); $$ = $7;
-//$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
+//$7->ebl.emplace_back($2, $5); $$ = $7;
+$7->ebl.push_back(new ExprBlock($2, $5)); $$ = $7;
 #endif
 }
 	| IF expr COLON INDENT block UNINDENT cond_stmt1 ELSE COLON INDENT block UNINDENT
 								{
 #if TEST_MODE > TEST_PARSER
-$7->ebl.emplace_back($2, $5);
-$7->ebl.emplace_back(new NBool(true), $11); $$ = $7;
+//$7->ebl.emplace_back($2, $5);
+//$7->ebl.emplace_back(new NBool(true), $11); $$ = $7;
+$7->ebl.push_back(new ExprBlock($2, $5)); $7->ebl.push_back(new ExprBlock(new NBool(true), $11)); $$ = $7;
 //$7->bl.push_back($5); $7->bl.push_back($11); $7->el.push_back($2); $$ = $7;
 #endif
 }
 	| CASE expr COLON INDENT cond_stmt2 UNINDENT		{
 #if TEST_MODE > TEST_PARSER
-$5->Expression = *$2; $$ = $5;
+$5->Expression = $2; $$ = $5;
 #endif
 }
 	| CASE expr COLON INDENT cond_stmt2 DEFAULT COLON INDENT block	UNINDENT UNINDENT
 								{
 #if TEST_MODE > TEST_PARSER
-$5->ebl.emplace_back(new NBool(true), $9); $5->Expression = *$2; $$ = $5;
+$5->ebl.push_back(new ExprBlock(new NBool(true), $9)); $5->Expression = $2; $$ = $5;
+//$5->ebl.emplace_back(new NBool(true), $9); $5->Expression = $2; $$ = $5;
 #endif
 }
 ;
@@ -427,7 +436,8 @@ $$ = new NIf();
 }	//NIf() has two list: Block and Expression List. if we have 'else' then bl.length -1 = el.length . if we do not have 'else' then bl.length = el.length .
 	| ELIF expr COLON INDENT block UNINDENT cond_stmt1	{
 #if TEST_MODE > TEST_PARSER
-$7->ebl.emplace_back($2, $5); $$ = $7;
+//$7->ebl.emplace_back($2, $5); $$ = $7;
+$7->ebl.push_back(new ExprBlock($2, $5)); $$ = $7;
 //$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
 #endif
 }
@@ -440,7 +450,8 @@ $$ = new NCase();
 }
 	| const_val COLON INDENT block UNINDENT cond_stmt2	{
 #if TEST_MODE > TEST_PARSER
-$6->ebl.emplace_back($1, $4); $$ = $6;
+$6->ebl.push_back(new ExprBlock($1, $4)); $$ = $6;
+//$6->ebl.emplace_back($1, $4); $$ = $6;
 #endif
 }
 ;
@@ -449,7 +460,7 @@ loop_stmt :
 //	  FOR id IN COLON block
 	  FOR id IN loop_stmt1 COLON INDENT block UNINDENT	{
 #if TEST_MODE > TEST_PARSER
-$$ = new NFor(*$2, *$4, *$7);
+$4->id = $2; $4->block = $7; $$ = $4;
 #endif
 }		//new NFor(NIdentifier id, NExpression range, NBlock block);
 	| WHILE expr COLON INDENT block	UNINDENT		{
@@ -460,31 +471,31 @@ $$ = new NWhile(*$2, *$5);
 ;
 loop_stmt1 :							{
 #if TEST_MODE > TEST_PARSER
-$$ = new NBlank();
+$$ = new NFor(NULL, NULL, 1);
 #endif
 }
 	| id							{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression(*$1);
+$$ = new NFor($1, NULL, 2);
 #endif
 }
 	| RANGE loop_stmt2					{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression(0, *$2);
+$$ = new NFor($2, NULL, 3);
 #endif
 }
 	| RANGE loop_stmt2 TO loop_stmt2			{
 #if TEST_MODE > TEST_PARSER
-$$ = new NExpression(*$2, *$4);
+$$ = new NFor($2, $4, 4);
 #endif
 }
 ;
-loop_stmt2 :							{
+loop_stmt2 :							/*{
 #if TEST_MODE > TEST_PARSER
 $$ = new NBlank();
 #endif
 }
-	| const_int
+	|*/const_int						{$<expr>$ = $1;}
 	| id							{$<expr>$ = $1;}
 ;
 
@@ -507,7 +518,7 @@ $$ = new NBlock();
 return_stmt :
 	  RETURN  						{
 #if TEST_MODE > TEST_PARSER
-$$ = new NReturn( new IdentifierList() );
+$$ = new NReturn( *(new IdentifierList()) );
 #endif
 }
 	| RETURN id id1 					{
@@ -524,7 +535,7 @@ $$ = new IdentifierList();
 }
 	| COMMA id id1						{
 #if TEST_MODE > TEST_PARSER
-$3.push_back($2); $$ = $3;
+$3->push_back($2); $$ = $3;
 #endif
 }
 ;
@@ -588,7 +599,7 @@ conditional : EQEQ | NOTEQ | GTEQ | LTEQ | LT | GT
 ;
 
 const_val : 
-	  const_int
+	  const_int		{$<expr>$ = $1;}
 	| CONST_REAL 		{
 #if TEST_MODE > TEST_PARSER
 $$ = new NReal( atof($1->c_str() ) ); delete $1;
@@ -596,7 +607,7 @@ $$ = new NReal( atof($1->c_str() ) ); delete $1;
 }
 	| CONST_CHAR 		{
 #if TEST_MODE > TEST_PARSER
-$$ = new NChar($1->c_str()); delete $1;
+$$ = new NChar($1->c_str()[0]); delete $1;
 #endif
 }
 	| TRUE			{
@@ -611,10 +622,7 @@ $$ = new NBool(false); delete $1;
 }
 	| CONST_STRING 		{
 #if TEST_MODE > TEST_PARSER
-$$ = new NString(
-$1->c_str()
-); 
-delete $1;
+$$ = new NString(*$1); delete $1;
 #endif
 }
 	| CONST_LONG 		{
@@ -643,12 +651,13 @@ $$ = new NIdentifier (*$1); delete $1;
 
 %%
 
-#if TEST_MODE == TEST_PARSER
+#if TEST_MODE < TEST_NONE
 
 #include<cctype>
 #include<cstring>
 int count=0;
 extern int yyparse();
+extern NBlock* programBlock;
 
 int main(int argc, char *argv[])
 {
@@ -657,13 +666,14 @@ int main(int argc, char *argv[])
 //	*strstr(argv[1], ".lulu") = '\0';
 //	yyout = fopen(strcat(argv[1], "ParseReport.txt"), "w");
 	
-   if(!yyparse()){
+	if(!yyparse()){
 		printf("yes\n");
 	}else{
 		printf("no\n");
 	}
 //	fclose(yyin);
 //	fclose(yyout);
+	//programBlock->codeGen();
     return 0;
 }
 
