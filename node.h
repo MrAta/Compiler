@@ -362,11 +362,15 @@ public:
 class NProgram : public Node {
 public:
 	DeclarationList& declarations;
-	NProgram(DeclarationList& declarations) : declarations(declarations)
-		{ TEST_PRINT(); TEST_PRINT_ME(7); }
+	NIdentifier& start;
+	NIdentifier& finish;
+	NProgram(DeclarationList& declarations, NIdentifier& start, NIdentifier& finish) :
+		declarations(declarations), start(start), finish(finish) { TEST_PRINT(); TEST_PRINT_ME(7); }
 	CODEGEN_FUNC();
 	void print(){
 		DeclarationList::reverse_iterator rit;
+		TEST_PRINT_LEAF("Program: Starts   with: "); TEST_PRINT_MEM(start ); TEST_PRINT_LEAF(std::endl);
+		TEST_PRINT_LEAF("Program: Finishes with: "); TEST_PRINT_MEM(finish); TEST_PRINT_LEAF(std::endl);
 		TEST_PRINT_LEAF("Program: Begin");TEST_PRINT_LEAF(std::endl);
 		for (rit = declarations.rbegin(); rit != declarations.rend(); rit++) {
 			TEST_PRINT_MEM(**rit);

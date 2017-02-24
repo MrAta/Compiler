@@ -1562,7 +1562,7 @@ yyreduce:
 #line 198 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.prog) = programBlock = new NProgram(*(yyvsp[0].dec_l));
+(yyval.prog) = programBlock = new NProgram(*(yyvsp[0].dec_l), *start, *finish);
 #endif
 }
 #line 1569 "parser.cpp" /* yacc.c:1646  */

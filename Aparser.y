@@ -197,7 +197,7 @@ long lval;
 program :
 	program1						{
 #if TEST_MODE > TEST_PARSER
-$$ = programBlock = new NProgram(*$1);
+$$ = programBlock = new NProgram(*$1, *start, *finish);
 #endif
 }
 ;
