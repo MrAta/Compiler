@@ -108,8 +108,22 @@ public:
 	virtual void print() {}
 };
 
+class NForIterator : public Node {
+public:
+	virtual int start() {}
+	virtual int step() {}
+	virtual int end() {}
+	CODEGEN_FUNC();
+	virtual void print() {}
+};
 
-class NInteger : public NConst {
+class NForRangeOperand : public Node {
+public:
+	CODEGEN_FUNC();
+	virtual void print() {}
+};
+
+class NInteger : public NConst, public NForRangeOperand {
 public:
 	long value;
 	NInteger(int value) : value(value) { TEST_PRINT(); TEST_PRINT_ME(1); }
@@ -145,7 +159,7 @@ public:
 	NChar(char value) : value(value) { TEST_PRINT(); TEST_PRINT_ME(1); }
 	CODEGEN_FUNC();
 	void print(){
-		TEST_PRINT_LEAF(value);
+		printf("%c", value);//TEST_PRINT_LEAF(value);
 	}
 };
 
@@ -170,7 +184,7 @@ public:
 	}
 };
 
-class NIdentifier : public NExpression, public AssignmentLHS {
+class NIdentifier : public NExpression, public AssignmentLHS, public NForRangeOperand {
 public:
 	std::string name;
 	NIdentifier(std::string& name) : name(name) { TEST_PRINT(); TEST_PRINT_ME(1); }
@@ -354,6 +368,7 @@ public:
 	NBlock& block;
 	NCaseDefault(NBlock& block) :
 		block(block) { TEST_PRINT(); TEST_PRINT_ME(6); }
+	NCaseDefault() : NCaseDefault(*(new NBlock())) {  }
 	CODEGEN_FUNC();
 	void print(){
 		TEST_PRINT_LEAF("Default:");
@@ -364,9 +379,9 @@ public:
 
 class NCase : public Node {
 public:
-	NInteger& condition;
+	NConst& condition;
 	NBlock& block;
-	NCase(NInteger& condition, NBlock& block) :
+	NCase(NConst& condition, NBlock& block) :
 		condition(condition), block(block) { TEST_PRINT(); TEST_PRINT_ME(6); }
 	CODEGEN_FUNC();
 	void print(){
@@ -382,11 +397,22 @@ class NSwitch : public NConditional {
 public:
 	NExpression& expression;
 	CaseList cases;
-	NCaseDefault* default_case;
-	NSwitch(NExpression& expression, CaseList cases, NCaseDefault* default_case) :
+	NCaseDefault& default_case;
+	NSwitch(NExpression& expression, CaseList cases, NCaseDefault& default_case) :
 		expression(expression), cases(cases), default_case(default_case) { TEST_PRINT(); TEST_PRINT_ME(7); }
 	CODEGEN_FUNC();
-	void print(){}
+	void print(){
+		CaseList::reverse_iterator rit;
+		TEST_PRINT_LEAF("Switch:");
+		TEST_PRINT_MEM(expression);
+		TEST_PRINT_LEAF(std::endl);
+		for (rit = cases.rbegin(); rit != cases.rend(); rit++) {
+			TEST_PRINT_MEM(**rit);
+		}
+		TEST_PRINT_LEAF("Default:");
+		TEST_PRINT_MEM(default_case);
+		TEST_PRINT_LEAF(std::endl);
+	}
 };
 
 class NIf : public NConditional {
@@ -396,7 +422,90 @@ public:
 	NBlock& else_block;
 	NIf(NExpression& expression, NBlock& if_block, NBlock& else_block) :
 		expression(expression), if_block(if_block), else_block(else_block) { TEST_PRINT(); TEST_PRINT_ME(7); }
+	CODEGEN_FUNC();
+	void print(){
+		TEST_PRINT_LEAF("If ");
+		TEST_PRINT_MEM(expression);
+		TEST_PRINT_LEAF("Then:");
+		TEST_PRINT_LEAF(std::endl);
+		TEST_PRINT_MEM(if_block);
+		TEST_PRINT_LEAF(std::endl);
+		TEST_PRINT_LEAF("Else ");
+		TEST_PRINT_MEM(else_block);
+		TEST_PRINT_LEAF(std::endl);		
+	}
 };
+
+class NForRange : public NForIterator {
+public:
+	NForRangeOperand& from;
+	NForRangeOperand& to;
+	NForRange(NForRangeOperand& from, NForRangeOperand& to) :
+		from(from), to(to) { TEST_PRINT(); TEST_PRINT_ME(6); }
+	CODEGEN_FUNC();
+	void print(){
+		TEST_PRINT_LEAF("Range: from ");
+		TEST_PRINT_MEM(from);
+		TEST_PRINT_LEAF("to ");
+		TEST_PRINT_MEM(to);
+	}
+private:
+	int start() {}
+	int step() {}
+	int end() {}
+};
+
+class NForEach : public NForIterator {
+public:
+	NIdentifier& id;
+	NForEach(NIdentifier& id) :
+		id(id) { TEST_PRINT(); TEST_PRINT_ME(6); }
+	CODEGEN_FUNC();
+	void print(){
+		TEST_PRINT_LEAF("Each: ");
+		TEST_PRINT_MEM(id);
+	}
+private:
+	int start() {}
+	int step() {}
+	int end() {}
+};
+
+class NFor : public NStatement {
+public:
+	NIdentifier& id;
+	NForIterator& iter;
+	NBlock& blk;
+	NFor(NIdentifier& id, NForIterator& iter, NBlock& blk) :
+		id(id), iter(iter), blk(blk) { TEST_PRINT(); TEST_PRINT_ME(7); }
+	CODEGEN_FUNC();
+	void print(){
+		TEST_PRINT_LEAF("For ");
+		TEST_PRINT_MEM(id);
+		TEST_PRINT_LEAF(" in ");
+		TEST_PRINT_MEM(iter);
+		TEST_PRINT_MEM(blk);
+		TEST_PRINT_LEAF(std::endl);
+	}
+};
+
+class NWhile : public NStatement {
+public:
+	NExpression& expr;
+	NBlock& blk;
+	NWhile(NExpression& expr, NBlock& blk) :
+		expr(expr), blk(blk) { TEST_PRINT(); TEST_PRINT_ME(7); }
+	CODEGEN_FUNC();
+	void print(){
+		TEST_PRINT_LEAF("While ");
+		TEST_PRINT_MEM(expr);
+		TEST_PRINT_LEAF(" do");
+		TEST_PRINT_LEAF(std::endl);
+		TEST_PRINT_MEM(blk);
+		TEST_PRINT_LEAF(std::endl);
+	}
+};
+
 
 class NFunctionDecl : public NDecl {
 public:

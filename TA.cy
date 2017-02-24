@@ -48,7 +48,7 @@ main:
 	for y in Y:
 		y = 0
 
-	for i in range 100:
+	for i in range A to 100:
 		Y[i] = i*2
 
 	# simple if statement
@@ -61,6 +61,10 @@ main:
 
 	Ch[char] 
 	read(Ch)
+
+	while(x!=y):
+		y=z
+		z=y
 
 	# case statement, notice indents
 	case Ch:

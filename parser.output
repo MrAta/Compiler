@@ -47,50 +47,51 @@ Grammar
    26          | func_call
    27          | if_stmt
    28          | case_stmt
-   29          | loop_stmt
-   30          | return_stmt
-   31          | BREAK
-   32          | CONTINUE
+   29          | for_stmt
+   30          | while_stmt
+   31          | return_stmt
+   32          | BREAK
+   33          | CONTINUE
 
-   33 assignment: assignment_lhs EQ expr expr1
+   34 assignment: assignment_lhs EQ expr expr1
 
-   34 assignment_lhs: id
-   35               | array
-   36               | var_dcl
+   35 assignment_lhs: id
+   36               | array
+   37               | var_dcl
 
-   37 expr1: %empty
-   38      | COMMA expr expr1
+   38 expr1: %empty
+   39      | COMMA expr expr1
 
-   39 func_call: id func_param
+   40 func_call: id func_param
 
-   40 func_param: LPAREN RPAREN
-   41           | LPAREN expr func_param1 RPAREN
+   41 func_param: LPAREN RPAREN
+   42           | LPAREN expr func_param1 RPAREN
 
-   42 func_param1: %empty
-   43            | COMMA expr func_param1
+   43 func_param1: %empty
+   44            | COMMA expr func_param1
 
-   44 if_stmt: IF expr COLON INDENT block UNINDENT if_stmt1
+   45 if_stmt: IF expr COLON INDENT block UNINDENT if_stmt1
 
-   45 if_stmt1: %empty
-   46         | ELSE COLON INDENT block UNINDENT
-   47         | ELIF expr COLON INDENT block UNINDENT if_stmt1
+   46 if_stmt1: %empty
+   47         | ELSE COLON INDENT block UNINDENT
+   48         | ELIF expr COLON INDENT block UNINDENT if_stmt1
 
-   48 case_stmt: CASE expr COLON INDENT case_stmt1 UNINDENT
-   49          | CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
+   49 case_stmt: CASE expr COLON INDENT case_stmt1 UNINDENT
+   50          | CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
 
-   50 case_stmt1: %empty
-   51           | const_int COLON INDENT block UNINDENT case_stmt1
+   51 case_stmt1: %empty
+   52           | const_int_val COLON INDENT block UNINDENT case_stmt1
 
-   52 loop_stmt: FOR id IN loop_stmt1 COLON INDENT block UNINDENT
-   53          | WHILE expr COLON INDENT block UNINDENT
+   53 for_stmt: FOR id IN for_stmt1 COLON INDENT block UNINDENT
 
-   54 loop_stmt1: %empty
-   55           | id
-   56           | RANGE loop_stmt2
-   57           | RANGE loop_stmt2 TO loop_stmt2
+   54 while_stmt: WHILE expr COLON INDENT block UNINDENT
 
-   58 loop_stmt2: const_int
-   59           | id
+   55 for_stmt1: id
+   56          | RANGE for_stmt2
+   57          | RANGE for_stmt2 TO for_stmt2
+
+   58 for_stmt2: const_int
+   59          | id
 
    60 return_stmt: RETURN
    61            | RETURN id id1
@@ -125,55 +126,57 @@ Grammar
    87       | expr LT expr
    88       | expr GT expr
 
-   89 const_val: const_int
+   89 const_val: const_int_val
    90          | CONST_REAL
-   91          | CONST_CHAR
-   92          | TRUE
-   93          | FALSE
-   94          | CONST_STRING
-   95          | CONST_LONG
+   91          | TRUE
+   92          | FALSE
+   93          | CONST_STRING
 
-   96 type: BOOL
-   97     | INT
-   98     | LONG
-   99     | CHAR
-  100     | REAL
-  101     | STRING
+   94 type: BOOL
+   95     | INT
+   96     | LONG
+   97     | CHAR
+   98     | REAL
+   99     | STRING
 
-  102 const_int: CONST_INT
+  100 const_int_val: const_int
+  101              | CONST_CHAR
+  102              | CONST_LONG
 
-  103 id: ID
+  103 const_int: CONST_INT
 
-  104 array: id LBRACK expr expr1 RBRACK
+  104 id: ID
+
+  105 array: id LBRACK expr expr1 RBRACK
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-INDENT (258) 15 16 17 18 44 46 47 48 49 51 52 53
-UNINDENT (259) 15 16 17 18 44 46 47 48 49 51 52 53
-LBRACK (260) 10 11 104
-RBRACK (261) 10 11 104
+INDENT (258) 15 16 17 18 45 47 48 49 50 52 53 54
+UNINDENT (259) 15 16 17 18 45 47 48 49 50 52 53 54
+LBRACK (260) 10 11 105
+RBRACK (261) 10 11 105
 START (262) 7
 FINISH (263) 8
-WHILE (264) 53
-FOR (265) 52
-IN (266) 52
+WHILE (264) 54
+FOR (265) 53
+IN (266) 53
 RANGE (267) 56 57
 TO (268) 57
-BREAK (269) 31
-CONTINUE (270) 32
-IF (271) 44
-ELSE (272) 46
-ELIF (273) 47
-CASE (274) 48 49
-DEFAULT (275) 49
+BREAK (269) 32
+CONTINUE (270) 33
+IF (271) 45
+ELSE (272) 47
+ELIF (273) 48
+CASE (274) 49 50
+DEFAULT (275) 50
 RETURN (276) 60 61
-COLON (277) 15 16 17 18 44 46 47 48 49 51 52 53
+COLON (277) 15 16 17 18 45 47 48 49 50 52 53 54
 NOT (278) 71
-COMMA (279) 13 14 20 38 43 63
-EQ (280) 33
+COMMA (279) 13 14 20 39 44 63
+EQ (280) 34
 OROR (281) 81
 ANDAND (282) 82
 OR (283) 79
@@ -193,22 +196,22 @@ MOD (296) 77
 SIZEOF (297)
 NEG (298)
 COMP (299) 72
-LPAREN (300) 40 41 64
-RPAREN (301) 40 41 64
-BOOL (302) 96
-INT (303) 97
-LONG (304) 98
-CHAR (305) 99
-REAL (306) 100
-STRING (307) 101
-ID (308) 103
-CONST_INT (309) 102
+LPAREN (300) 41 42 64
+RPAREN (301) 41 42 64
+BOOL (302) 94
+INT (303) 95
+LONG (304) 96
+CHAR (305) 97
+REAL (306) 98
+STRING (307) 99
+ID (308) 104
+CONST_INT (309) 103
 CONST_REAL (310) 90
-CONST_CHAR (311) 91
-CONST_STRING (312) 94
-CONST_LONG (313) 95
-TRUE (314) 92
-FALSE (315) 93
+CONST_CHAR (311) 101
+CONST_STRING (312) 93
+CONST_LONG (313) 102
+TRUE (314) 91
+FALSE (315) 92
 
 
 Nonterminals, with rules where they appear
@@ -224,7 +227,7 @@ start (64)
 finish (65)
     on left: 8, on right: 6
 var_dcl (66)
-    on left: 9, on right: 3 16 18 20 25 36
+    on left: 9, on right: 3 16 18 20 25 37
 ts_dcl (67)
     on left: 10 11, on right: 9 16 17
 ts_dcl1 (68)
@@ -234,59 +237,63 @@ func_dcl (69)
 func_dcl1 (70)
     on left: 19 20, on right: 16 18 20
 block (71)
-    on left: 21, on right: 15 16 17 18 44 46 47 49 51 52 53
+    on left: 21, on right: 15 16 17 18 45 47 48 50 52 53 54
 block1 (72)
     on left: 22 23, on right: 21 23
 statement (73)
-    on left: 24 25 26 27 28 29 30 31 32, on right: 23
+    on left: 24 25 26 27 28 29 30 31 32 33, on right: 23
 assignment (74)
-    on left: 33, on right: 24
+    on left: 34, on right: 24
 assignment_lhs (75)
-    on left: 34 35 36, on right: 33
+    on left: 35 36 37, on right: 34
 expr1 (76)
-    on left: 37 38, on right: 33 38 104
+    on left: 38 39, on right: 34 39 105
 func_call (77)
-    on left: 39, on right: 26 66
+    on left: 40, on right: 26 66
 func_param (78)
-    on left: 40 41, on right: 39
+    on left: 41 42, on right: 40
 func_param1 (79)
-    on left: 42 43, on right: 41 43
+    on left: 43 44, on right: 42 44
 if_stmt (80)
-    on left: 44, on right: 27
+    on left: 45, on right: 27
 if_stmt1 (81)
-    on left: 45 46 47, on right: 44 47
+    on left: 46 47 48, on right: 45 48
 case_stmt (82)
-    on left: 48 49, on right: 28
+    on left: 49 50, on right: 28
 case_stmt1 (83)
-    on left: 50 51, on right: 48 49 51
-loop_stmt (84)
-    on left: 52 53, on right: 29
-loop_stmt1 (85)
-    on left: 54 55 56 57, on right: 52
-loop_stmt2 (86)
+    on left: 51 52, on right: 49 50 52
+for_stmt (84)
+    on left: 53, on right: 29
+while_stmt (85)
+    on left: 54, on right: 30
+for_stmt1 (86)
+    on left: 55 56 57, on right: 53
+for_stmt2 (87)
     on left: 58 59, on right: 56 57
-return_stmt (87)
-    on left: 60 61, on right: 30
-id1 (88)
+return_stmt (88)
+    on left: 60 61, on right: 31
+id1 (89)
     on left: 62 63, on right: 61 63
-expr (89)
-    on left: 64 65 66 67 68 69 70 71 72, on right: 33 38 41 43 44 47
-    48 49 53 64 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86
-    87 88 104
-bin_op (90)
+expr (90)
+    on left: 64 65 66 67 68 69 70 71 72, on right: 34 39 42 44 45 48
+    49 50 54 64 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86
+    87 88 105
+bin_op (91)
     on left: 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88, on right:
     65
-const_val (91)
-    on left: 89 90 91 92 93 94 95, on right: 69
-type (92)
-    on left: 96 97 98 99 100 101, on right: 10 11 13 14
-const_int (93)
-    on left: 102, on right: 11 13 51 58 89
-id (94)
-    on left: 103, on right: 7 8 9 15 16 17 18 34 39 52 55 59 61 63
-    67 104
-array (95)
-    on left: 104, on right: 35 68
+const_val (92)
+    on left: 89 90 91 92 93, on right: 69
+type (93)
+    on left: 94 95 96 97 98 99, on right: 10 11 13 14
+const_int_val (94)
+    on left: 100 101 102, on right: 52 89
+const_int (95)
+    on left: 103, on right: 11 13 58 100
+id (96)
+    on left: 104, on right: 7 8 9 15 16 17 18 35 40 53 55 59 61 63
+    67 105
+array (97)
+    on left: 105, on right: 36 68
 
 
 State 0
@@ -345,9 +352,9 @@ State 3
 
 State 4
 
-  103 id: ID .
+  104 id: ID .
 
-    $default  reduce using rule 103 (id)
+    $default  reduce using rule 104 (id)
 
 
 State 5
@@ -471,44 +478,44 @@ State 12
 
 State 13
 
-   96 type: BOOL .
+   94 type: BOOL .
 
-    $default  reduce using rule 96 (type)
+    $default  reduce using rule 94 (type)
 
 
 State 14
 
-   97 type: INT .
+   95 type: INT .
 
-    $default  reduce using rule 97 (type)
+    $default  reduce using rule 95 (type)
 
 
 State 15
 
-   98 type: LONG .
+   96 type: LONG .
 
-    $default  reduce using rule 98 (type)
+    $default  reduce using rule 96 (type)
 
 
 State 16
 
-   99 type: CHAR .
+   97 type: CHAR .
 
-    $default  reduce using rule 99 (type)
+    $default  reduce using rule 97 (type)
 
 
 State 17
 
-  100 type: REAL .
+   98 type: REAL .
 
-    $default  reduce using rule 100 (type)
+    $default  reduce using rule 98 (type)
 
 
 State 18
 
-  101 type: STRING .
+   99 type: STRING .
 
-    $default  reduce using rule 101 (type)
+    $default  reduce using rule 99 (type)
 
 
 State 19
@@ -692,10 +699,11 @@ State 37
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
 State 38
@@ -704,7 +712,7 @@ State 38
 
     ID  shift, and go to state 4
 
-    var_dcl  go to state 66
+    var_dcl  go to state 67
     id       go to state 31
 
 
@@ -712,7 +720,7 @@ State 39
 
    18 func_dcl: id var_dcl func_dcl1 . COLON INDENT block UNINDENT
 
-    COLON  shift, and go to state 67
+    COLON  shift, and go to state 68
 
 
 State 40
@@ -721,25 +729,25 @@ State 40
    14        | COMMA type . ts_dcl1
 
     COMMA  shift, and go to state 32
-    LT     shift, and go to state 68
+    LT     shift, and go to state 69
 
     $default  reduce using rule 12 (ts_dcl1)
 
-    ts_dcl1  go to state 69
+    ts_dcl1  go to state 70
 
 
 State 41
 
-  102 const_int: CONST_INT .
+  103 const_int: CONST_INT .
 
-    $default  reduce using rule 102 (const_int)
+    $default  reduce using rule 103 (const_int)
 
 
 State 42
 
    11 ts_dcl: LBRACK type LT const_int . GT ts_dcl1 RBRACK
 
-    GT  shift, and go to state 70
+    GT  shift, and go to state 71
 
 
 State 43
@@ -765,7 +773,7 @@ State 44
     $default  reduce using rule 22 (block1)
 
     var_dcl         go to state 53
-    block           go to state 71
+    block           go to state 72
     block1          go to state 55
     statement       go to state 56
     assignment      go to state 57
@@ -773,119 +781,123 @@ State 44
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
 State 45
 
    16 func_dcl: ts_dcl id var_dcl func_dcl1 . COLON INDENT block UNINDENT
 
-    COLON  shift, and go to state 72
+    COLON  shift, and go to state 73
 
 
 State 46
 
-   53 loop_stmt: WHILE . expr COLON INDENT block UNINDENT
+   54 while_stmt: WHILE . expr COLON INDENT block UNINDENT
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 84
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 85
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 47
 
-   52 loop_stmt: FOR . id IN loop_stmt1 COLON INDENT block UNINDENT
+   53 for_stmt: FOR . id IN for_stmt1 COLON INDENT block UNINDENT
 
     ID  shift, and go to state 4
 
-    id  go to state 90
+    id  go to state 92
 
 
 State 48
 
-   31 statement: BREAK .
-
-    $default  reduce using rule 31 (statement)
-
-
-State 49
-
-   32 statement: CONTINUE .
+   32 statement: BREAK .
 
     $default  reduce using rule 32 (statement)
 
 
+State 49
+
+   33 statement: CONTINUE .
+
+    $default  reduce using rule 33 (statement)
+
+
 State 50
 
-   44 if_stmt: IF . expr COLON INDENT block UNINDENT if_stmt1
+   45 if_stmt: IF . expr COLON INDENT block UNINDENT if_stmt1
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 91
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 93
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 51
 
-   48 case_stmt: CASE . expr COLON INDENT case_stmt1 UNINDENT
-   49          | CASE . expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
+   49 case_stmt: CASE . expr COLON INDENT case_stmt1 UNINDENT
+   50          | CASE . expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 92
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 94
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 52
@@ -897,15 +909,15 @@ State 52
 
     $default  reduce using rule 60 (return_stmt)
 
-    id  go to state 93
+    id  go to state 95
 
 
 State 53
 
    25 statement: var_dcl .
-   36 assignment_lhs: var_dcl .
+   37 assignment_lhs: var_dcl .
 
-    EQ        reduce using rule 36 (assignment_lhs)
+    EQ        reduce using rule 37 (assignment_lhs)
     $default  reduce using rule 25 (statement)
 
 
@@ -913,7 +925,7 @@ State 54
 
    15 func_dcl: id COLON INDENT block . UNINDENT
 
-    UNINDENT  shift, and go to state 94
+    UNINDENT  shift, and go to state 96
 
 
 State 55
@@ -939,17 +951,18 @@ State 56
     $default  reduce using rule 22 (block1)
 
     var_dcl         go to state 53
-    block1          go to state 95
+    block1          go to state 97
     statement       go to state 56
     assignment      go to state 57
     assignment_lhs  go to state 58
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
 State 57
@@ -961,9 +974,9 @@ State 57
 
 State 58
 
-   33 assignment: assignment_lhs . EQ expr expr1
+   34 assignment: assignment_lhs . EQ expr expr1
 
-    EQ  shift, and go to state 96
+    EQ  shift, and go to state 98
 
 
 State 59
@@ -989,42 +1002,49 @@ State 61
 
 State 62
 
-   29 statement: loop_stmt .
+   29 statement: for_stmt .
 
     $default  reduce using rule 29 (statement)
 
 
 State 63
 
-   30 statement: return_stmt .
+   30 statement: while_stmt .
 
     $default  reduce using rule 30 (statement)
 
 
 State 64
 
-    9 var_dcl: id . ts_dcl
-   34 assignment_lhs: id .
-   39 func_call: id . func_param
-  104 array: id . LBRACK expr expr1 RBRACK
+   31 statement: return_stmt .
 
-    LBRACK  shift, and go to state 97
-    LPAREN  shift, and go to state 98
-
-    $default  reduce using rule 34 (assignment_lhs)
-
-    ts_dcl      go to state 30
-    func_param  go to state 99
+    $default  reduce using rule 31 (statement)
 
 
 State 65
 
-   35 assignment_lhs: array .
+    9 var_dcl: id . ts_dcl
+   35 assignment_lhs: id .
+   40 func_call: id . func_param
+  105 array: id . LBRACK expr expr1 RBRACK
+
+    LBRACK  shift, and go to state 99
+    LPAREN  shift, and go to state 100
 
     $default  reduce using rule 35 (assignment_lhs)
 
+    ts_dcl      go to state 30
+    func_param  go to state 101
+
 
 State 66
+
+   36 assignment_lhs: array .
+
+    $default  reduce using rule 36 (assignment_lhs)
+
+
+State 67
 
    20 func_dcl1: COMMA var_dcl . func_dcl1
 
@@ -1032,33 +1052,33 @@ State 66
 
     $default  reduce using rule 19 (func_dcl1)
 
-    func_dcl1  go to state 100
-
-
-State 67
-
-   18 func_dcl: id var_dcl func_dcl1 COLON . INDENT block UNINDENT
-
-    INDENT  shift, and go to state 101
+    func_dcl1  go to state 102
 
 
 State 68
+
+   18 func_dcl: id var_dcl func_dcl1 COLON . INDENT block UNINDENT
+
+    INDENT  shift, and go to state 103
+
+
+State 69
 
    13 ts_dcl1: COMMA type LT . const_int GT ts_dcl1
 
     CONST_INT  shift, and go to state 41
 
-    const_int  go to state 102
+    const_int  go to state 104
 
 
-State 69
+State 70
 
    14 ts_dcl1: COMMA type ts_dcl1 .
 
     $default  reduce using rule 14 (ts_dcl1)
 
 
-State 70
+State 71
 
    11 ts_dcl: LBRACK type LT const_int GT . ts_dcl1 RBRACK
 
@@ -1066,179 +1086,183 @@ State 70
 
     $default  reduce using rule 12 (ts_dcl1)
 
-    ts_dcl1  go to state 103
-
-
-State 71
-
-   17 func_dcl: ts_dcl id COLON INDENT block . UNINDENT
-
-    UNINDENT  shift, and go to state 104
+    ts_dcl1  go to state 105
 
 
 State 72
 
-   16 func_dcl: ts_dcl id var_dcl func_dcl1 COLON . INDENT block UNINDENT
+   17 func_dcl: ts_dcl id COLON INDENT block . UNINDENT
 
-    INDENT  shift, and go to state 105
+    UNINDENT  shift, and go to state 106
 
 
 State 73
 
-   71 expr: NOT . expr
+   16 func_dcl: ts_dcl id var_dcl func_dcl1 COLON . INDENT block UNINDENT
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
-    ID            shift, and go to state 4
-    CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
-
-    func_call  go to state 83
-    expr       go to state 106
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    INDENT  shift, and go to state 107
 
 
 State 74
 
-   70 expr: MINUS . expr
+   71 expr: NOT . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 107
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 108
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 75
 
-   72 expr: COMP . expr
+   70 expr: MINUS . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 108
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 109
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 76
 
-   64 expr: LPAREN . expr RPAREN
+   72 expr: COMP . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 109
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 110
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 77
+
+   64 expr: LPAREN . expr RPAREN
+
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
+    ID            shift, and go to state 4
+    CONST_INT     shift, and go to state 41
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
+
+    func_call      go to state 84
+    expr           go to state 111
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
+
+
+State 78
 
    90 const_val: CONST_REAL .
 
     $default  reduce using rule 90 (const_val)
 
 
-State 78
-
-   91 const_val: CONST_CHAR .
-
-    $default  reduce using rule 91 (const_val)
-
-
 State 79
 
-   94 const_val: CONST_STRING .
+  101 const_int_val: CONST_CHAR .
 
-    $default  reduce using rule 94 (const_val)
+    $default  reduce using rule 101 (const_int_val)
 
 
 State 80
 
-   95 const_val: CONST_LONG .
-
-    $default  reduce using rule 95 (const_val)
-
-
-State 81
-
-   92 const_val: TRUE .
-
-    $default  reduce using rule 92 (const_val)
-
-
-State 82
-
-   93 const_val: FALSE .
+   93 const_val: CONST_STRING .
 
     $default  reduce using rule 93 (const_val)
 
 
+State 81
+
+  102 const_int_val: CONST_LONG .
+
+    $default  reduce using rule 102 (const_int_val)
+
+
+State 82
+
+   91 const_val: TRUE .
+
+    $default  reduce using rule 91 (const_val)
+
+
 State 83
+
+   92 const_val: FALSE .
+
+    $default  reduce using rule 92 (const_val)
+
+
+State 84
 
    66 expr: func_call .
 
     $default  reduce using rule 66 (expr)
 
 
-State 84
+State 85
 
-   53 loop_stmt: WHILE expr . COLON INDENT block UNINDENT
+   54 while_stmt: WHILE expr . COLON INDENT block UNINDENT
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
    75       | expr . MULT expr
@@ -1256,214 +1280,222 @@ State 84
    87       | expr . LT expr
    88       | expr . GT expr
 
-    COLON   shift, and go to state 110
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
+    COLON   shift, and go to state 112
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
 
 
-State 85
+State 86
 
    65 expr: bin_op .
 
     $default  reduce using rule 65 (expr)
 
 
-State 86
+State 87
 
    69 expr: const_val .
 
     $default  reduce using rule 69 (expr)
 
 
-State 87
+State 88
 
-   89 const_val: const_int .
+   89 const_val: const_int_val .
 
     $default  reduce using rule 89 (const_val)
 
 
-State 88
+State 89
 
-   39 func_call: id . func_param
+  100 const_int_val: const_int .
+
+    $default  reduce using rule 100 (const_int_val)
+
+
+State 90
+
+   40 func_call: id . func_param
    67 expr: id .
-  104 array: id . LBRACK expr expr1 RBRACK
+  105 array: id . LBRACK expr expr1 RBRACK
 
-    LBRACK  shift, and go to state 127
-    LPAREN  shift, and go to state 98
+    LBRACK  shift, and go to state 129
+    LPAREN  shift, and go to state 100
 
     $default  reduce using rule 67 (expr)
 
-    func_param  go to state 99
+    func_param  go to state 101
 
 
-State 89
+State 91
 
    68 expr: array .
 
     $default  reduce using rule 68 (expr)
 
 
-State 90
-
-   52 loop_stmt: FOR id . IN loop_stmt1 COLON INDENT block UNINDENT
-
-    IN  shift, and go to state 128
-
-
-State 91
-
-   44 if_stmt: IF expr . COLON INDENT block UNINDENT if_stmt1
-   73 bin_op: expr . PLUS expr
-   74       | expr . MINUS expr
-   75       | expr . MULT expr
-   76       | expr . DIV expr
-   77       | expr . MOD expr
-   78       | expr . AND expr
-   79       | expr . OR expr
-   80       | expr . XOR expr
-   81       | expr . OROR expr
-   82       | expr . ANDAND expr
-   83       | expr . EQEQ expr
-   84       | expr . NOTEQ expr
-   85       | expr . GTEQ expr
-   86       | expr . LTEQ expr
-   87       | expr . LT expr
-   88       | expr . GT expr
-
-    COLON   shift, and go to state 129
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
-
-
 State 92
 
-   48 case_stmt: CASE expr . COLON INDENT case_stmt1 UNINDENT
-   49          | CASE expr . COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
-   73 bin_op: expr . PLUS expr
-   74       | expr . MINUS expr
-   75       | expr . MULT expr
-   76       | expr . DIV expr
-   77       | expr . MOD expr
-   78       | expr . AND expr
-   79       | expr . OR expr
-   80       | expr . XOR expr
-   81       | expr . OROR expr
-   82       | expr . ANDAND expr
-   83       | expr . EQEQ expr
-   84       | expr . NOTEQ expr
-   85       | expr . GTEQ expr
-   86       | expr . LTEQ expr
-   87       | expr . LT expr
-   88       | expr . GT expr
+   53 for_stmt: FOR id . IN for_stmt1 COLON INDENT block UNINDENT
 
-    COLON   shift, and go to state 130
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
+    IN  shift, and go to state 130
 
 
 State 93
 
-   61 return_stmt: RETURN id . id1
+   45 if_stmt: IF expr . COLON INDENT block UNINDENT if_stmt1
+   73 bin_op: expr . PLUS expr
+   74       | expr . MINUS expr
+   75       | expr . MULT expr
+   76       | expr . DIV expr
+   77       | expr . MOD expr
+   78       | expr . AND expr
+   79       | expr . OR expr
+   80       | expr . XOR expr
+   81       | expr . OROR expr
+   82       | expr . ANDAND expr
+   83       | expr . EQEQ expr
+   84       | expr . NOTEQ expr
+   85       | expr . GTEQ expr
+   86       | expr . LTEQ expr
+   87       | expr . LT expr
+   88       | expr . GT expr
 
-    COMMA  shift, and go to state 131
-
-    $default  reduce using rule 62 (id1)
-
-    id1  go to state 132
+    COLON   shift, and go to state 131
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
 
 
 State 94
+
+   49 case_stmt: CASE expr . COLON INDENT case_stmt1 UNINDENT
+   50          | CASE expr . COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
+   73 bin_op: expr . PLUS expr
+   74       | expr . MINUS expr
+   75       | expr . MULT expr
+   76       | expr . DIV expr
+   77       | expr . MOD expr
+   78       | expr . AND expr
+   79       | expr . OR expr
+   80       | expr . XOR expr
+   81       | expr . OROR expr
+   82       | expr . ANDAND expr
+   83       | expr . EQEQ expr
+   84       | expr . NOTEQ expr
+   85       | expr . GTEQ expr
+   86       | expr . LTEQ expr
+   87       | expr . LT expr
+   88       | expr . GT expr
+
+    COLON   shift, and go to state 132
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
+
+
+State 95
+
+   61 return_stmt: RETURN id . id1
+
+    COMMA  shift, and go to state 133
+
+    $default  reduce using rule 62 (id1)
+
+    id1  go to state 134
+
+
+State 96
 
    15 func_dcl: id COLON INDENT block UNINDENT .
 
     $default  reduce using rule 15 (func_dcl)
 
 
-State 95
+State 97
 
    23 block1: statement block1 .
 
     $default  reduce using rule 23 (block1)
 
 
-State 96
+State 98
 
-   33 assignment: assignment_lhs EQ . expr expr1
+   34 assignment: assignment_lhs EQ . expr expr1
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 133
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 135
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
-State 97
+State 99
 
    10 ts_dcl: LBRACK . type ts_dcl1 RBRACK
    11       | LBRACK . type LT const_int GT ts_dcl1 RBRACK
-  104 array: id LBRACK . expr expr1 RBRACK
+  105 array: id LBRACK . expr expr1 RBRACK
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     BOOL          shift, and go to state 13
     INT           shift, and go to state 14
     LONG          shift, and go to state 15
@@ -1472,66 +1504,68 @@ State 97
     STRING        shift, and go to state 18
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 134
-    bin_op     go to state 85
-    const_val  go to state 86
-    type       go to state 19
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
-
-
-State 98
-
-   40 func_param: LPAREN . RPAREN
-   41           | LPAREN . expr func_param1 RPAREN
-
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
-    RPAREN        shift, and go to state 135
-    ID            shift, and go to state 4
-    CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
-
-    func_call  go to state 83
-    expr       go to state 136
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
-
-
-State 99
-
-   39 func_call: id func_param .
-
-    $default  reduce using rule 39 (func_call)
+    func_call      go to state 84
+    expr           go to state 136
+    bin_op         go to state 86
+    const_val      go to state 87
+    type           go to state 19
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 100
+
+   41 func_param: LPAREN . RPAREN
+   42           | LPAREN . expr func_param1 RPAREN
+
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
+    RPAREN        shift, and go to state 137
+    ID            shift, and go to state 4
+    CONST_INT     shift, and go to state 41
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
+
+    func_call      go to state 84
+    expr           go to state 138
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
+
+
+State 101
+
+   40 func_call: id func_param .
+
+    $default  reduce using rule 40 (func_call)
+
+
+State 102
 
    20 func_dcl1: COMMA var_dcl func_dcl1 .
 
     $default  reduce using rule 20 (func_dcl1)
 
 
-State 101
+State 103
 
    18 func_dcl: id var_dcl func_dcl1 COLON INDENT . block UNINDENT
 
@@ -1547,7 +1581,7 @@ State 101
     $default  reduce using rule 22 (block1)
 
     var_dcl         go to state 53
-    block           go to state 137
+    block           go to state 139
     block1          go to state 55
     statement       go to state 56
     assignment      go to state 57
@@ -1555,34 +1589,35 @@ State 101
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
-
-
-State 102
-
-   13 ts_dcl1: COMMA type LT const_int . GT ts_dcl1
-
-    GT  shift, and go to state 138
-
-
-State 103
-
-   11 ts_dcl: LBRACK type LT const_int GT ts_dcl1 . RBRACK
-
-    RBRACK  shift, and go to state 139
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
 State 104
+
+   13 ts_dcl1: COMMA type LT const_int . GT ts_dcl1
+
+    GT  shift, and go to state 140
+
+
+State 105
+
+   11 ts_dcl: LBRACK type LT const_int GT ts_dcl1 . RBRACK
+
+    RBRACK  shift, and go to state 141
+
+
+State 106
 
    17 func_dcl: ts_dcl id COLON INDENT block UNINDENT .
 
     $default  reduce using rule 17 (func_dcl)
 
 
-State 105
+State 107
 
    16 func_dcl: ts_dcl id var_dcl func_dcl1 COLON INDENT . block UNINDENT
 
@@ -1598,7 +1633,7 @@ State 105
     $default  reduce using rule 22 (block1)
 
     var_dcl         go to state 53
-    block           go to state 140
+    block           go to state 142
     block1          go to state 55
     statement       go to state 56
     assignment      go to state 57
@@ -1606,13 +1641,14 @@ State 105
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
-State 106
+State 108
 
    71 expr: NOT expr .
    73 bin_op: expr . PLUS expr
@@ -1635,7 +1671,7 @@ State 106
     $default  reduce using rule 71 (expr)
 
 
-State 107
+State 109
 
    70 expr: MINUS expr .
    73 bin_op: expr . PLUS expr
@@ -1655,17 +1691,17 @@ State 107
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR    shift, and go to state 113
-    XOR   shift, and go to state 114
-    AND   shift, and go to state 115
-    MULT  shift, and go to state 124
-    DIV   shift, and go to state 125
-    MOD   shift, and go to state 126
+    OR    shift, and go to state 115
+    XOR   shift, and go to state 116
+    AND   shift, and go to state 117
+    MULT  shift, and go to state 126
+    DIV   shift, and go to state 127
+    MOD   shift, and go to state 128
 
     $default  reduce using rule 70 (expr)
 
 
-State 108
+State 110
 
    72 expr: COMP expr .
    73 bin_op: expr . PLUS expr
@@ -1688,7 +1724,7 @@ State 108
     $default  reduce using rule 72 (expr)
 
 
-State 109
+State 111
 
    64 expr: LPAREN expr . RPAREN
    73 bin_op: expr . PLUS expr
@@ -1708,614 +1744,629 @@ State 109
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
-    RPAREN  shift, and go to state 141
-
-
-State 110
-
-   53 loop_stmt: WHILE expr COLON . INDENT block UNINDENT
-
-    INDENT  shift, and go to state 142
-
-
-State 111
-
-   81 bin_op: expr OROR . expr
-
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
-    ID            shift, and go to state 4
-    CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
-
-    func_call  go to state 83
-    expr       go to state 143
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
+    RPAREN  shift, and go to state 143
 
 
 State 112
 
-   82 bin_op: expr ANDAND . expr
+   54 while_stmt: WHILE expr COLON . INDENT block UNINDENT
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
-    ID            shift, and go to state 4
-    CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
-
-    func_call  go to state 83
-    expr       go to state 144
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    INDENT  shift, and go to state 144
 
 
 State 113
 
-   79 bin_op: expr OR . expr
+   81 bin_op: expr OROR . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 145
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 145
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 114
 
-   80 bin_op: expr XOR . expr
+   82 bin_op: expr ANDAND . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 146
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 146
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 115
 
-   78 bin_op: expr AND . expr
+   79 bin_op: expr OR . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 147
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 147
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 116
 
-   83 bin_op: expr EQEQ . expr
+   80 bin_op: expr XOR . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 148
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 148
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 117
 
-   84 bin_op: expr NOTEQ . expr
+   78 bin_op: expr AND . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 149
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 149
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 118
 
-   87 bin_op: expr LT . expr
+   83 bin_op: expr EQEQ . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 150
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 150
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 119
 
-   86 bin_op: expr LTEQ . expr
+   84 bin_op: expr NOTEQ . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 151
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 151
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 120
 
-   88 bin_op: expr GT . expr
+   87 bin_op: expr LT . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 152
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 152
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 121
 
-   85 bin_op: expr GTEQ . expr
+   86 bin_op: expr LTEQ . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 153
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 153
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 122
 
-   73 bin_op: expr PLUS . expr
+   88 bin_op: expr GT . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 154
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 154
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 123
 
-   74 bin_op: expr MINUS . expr
+   85 bin_op: expr GTEQ . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 155
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 155
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 124
 
-   75 bin_op: expr MULT . expr
+   73 bin_op: expr PLUS . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 156
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 156
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 125
 
-   76 bin_op: expr DIV . expr
+   74 bin_op: expr MINUS . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 157
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 157
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 126
 
-   77 bin_op: expr MOD . expr
+   75 bin_op: expr MULT . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 158
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 158
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 127
 
-  104 array: id LBRACK . expr expr1 RBRACK
+   76 bin_op: expr DIV . expr
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
     ID            shift, and go to state 4
     CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    func_call  go to state 83
-    expr       go to state 134
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    func_call      go to state 84
+    expr           go to state 159
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 128
 
-   52 loop_stmt: FOR id IN . loop_stmt1 COLON INDENT block UNINDENT
+   77 bin_op: expr MOD . expr
 
-    RANGE  shift, and go to state 159
-    ID     shift, and go to state 4
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
+    ID            shift, and go to state 4
+    CONST_INT     shift, and go to state 41
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
 
-    $default  reduce using rule 54 (loop_stmt1)
-
-    loop_stmt1  go to state 160
-    id          go to state 161
+    func_call      go to state 84
+    expr           go to state 160
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 129
 
-   44 if_stmt: IF expr COLON . INDENT block UNINDENT if_stmt1
+  105 array: id LBRACK . expr expr1 RBRACK
 
-    INDENT  shift, and go to state 162
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
+    ID            shift, and go to state 4
+    CONST_INT     shift, and go to state 41
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
+
+    func_call      go to state 84
+    expr           go to state 136
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 130
 
-   48 case_stmt: CASE expr COLON . INDENT case_stmt1 UNINDENT
-   49          | CASE expr COLON . INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
+   53 for_stmt: FOR id IN . for_stmt1 COLON INDENT block UNINDENT
 
-    INDENT  shift, and go to state 163
+    RANGE  shift, and go to state 161
+    ID     shift, and go to state 4
+
+    for_stmt1  go to state 162
+    id         go to state 163
 
 
 State 131
+
+   45 if_stmt: IF expr COLON . INDENT block UNINDENT if_stmt1
+
+    INDENT  shift, and go to state 164
+
+
+State 132
+
+   49 case_stmt: CASE expr COLON . INDENT case_stmt1 UNINDENT
+   50          | CASE expr COLON . INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
+
+    INDENT  shift, and go to state 165
+
+
+State 133
 
    63 id1: COMMA . id id1
 
     ID  shift, and go to state 4
 
-    id  go to state 164
+    id  go to state 166
 
 
-State 132
+State 134
 
    61 return_stmt: RETURN id id1 .
 
     $default  reduce using rule 61 (return_stmt)
 
 
-State 133
-
-   33 assignment: assignment_lhs EQ expr . expr1
-   73 bin_op: expr . PLUS expr
-   74       | expr . MINUS expr
-   75       | expr . MULT expr
-   76       | expr . DIV expr
-   77       | expr . MOD expr
-   78       | expr . AND expr
-   79       | expr . OR expr
-   80       | expr . XOR expr
-   81       | expr . OROR expr
-   82       | expr . ANDAND expr
-   83       | expr . EQEQ expr
-   84       | expr . NOTEQ expr
-   85       | expr . GTEQ expr
-   86       | expr . LTEQ expr
-   87       | expr . LT expr
-   88       | expr . GT expr
-
-    COMMA   shift, and go to state 165
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
-
-    $default  reduce using rule 37 (expr1)
-
-    expr1  go to state 166
-
-
-State 134
-
-   73 bin_op: expr . PLUS expr
-   74       | expr . MINUS expr
-   75       | expr . MULT expr
-   76       | expr . DIV expr
-   77       | expr . MOD expr
-   78       | expr . AND expr
-   79       | expr . OR expr
-   80       | expr . XOR expr
-   81       | expr . OROR expr
-   82       | expr . ANDAND expr
-   83       | expr . EQEQ expr
-   84       | expr . NOTEQ expr
-   85       | expr . GTEQ expr
-   86       | expr . LTEQ expr
-   87       | expr . LT expr
-   88       | expr . GT expr
-  104 array: id LBRACK expr . expr1 RBRACK
-
-    COMMA   shift, and go to state 165
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
-
-    $default  reduce using rule 37 (expr1)
-
-    expr1  go to state 167
-
-
 State 135
 
-   40 func_param: LPAREN RPAREN .
+   34 assignment: assignment_lhs EQ expr . expr1
+   73 bin_op: expr . PLUS expr
+   74       | expr . MINUS expr
+   75       | expr . MULT expr
+   76       | expr . DIV expr
+   77       | expr . MOD expr
+   78       | expr . AND expr
+   79       | expr . OR expr
+   80       | expr . XOR expr
+   81       | expr . OROR expr
+   82       | expr . ANDAND expr
+   83       | expr . EQEQ expr
+   84       | expr . NOTEQ expr
+   85       | expr . GTEQ expr
+   86       | expr . LTEQ expr
+   87       | expr . LT expr
+   88       | expr . GT expr
 
-    $default  reduce using rule 40 (func_param)
+    COMMA   shift, and go to state 167
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
+
+    $default  reduce using rule 38 (expr1)
+
+    expr1  go to state 168
 
 
 State 136
 
-   41 func_param: LPAREN expr . func_param1 RPAREN
+   73 bin_op: expr . PLUS expr
+   74       | expr . MINUS expr
+   75       | expr . MULT expr
+   76       | expr . DIV expr
+   77       | expr . MOD expr
+   78       | expr . AND expr
+   79       | expr . OR expr
+   80       | expr . XOR expr
+   81       | expr . OROR expr
+   82       | expr . ANDAND expr
+   83       | expr . EQEQ expr
+   84       | expr . NOTEQ expr
+   85       | expr . GTEQ expr
+   86       | expr . LTEQ expr
+   87       | expr . LT expr
+   88       | expr . GT expr
+  105 array: id LBRACK expr . expr1 RBRACK
+
+    COMMA   shift, and go to state 167
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
+
+    $default  reduce using rule 38 (expr1)
+
+    expr1  go to state 169
+
+
+State 137
+
+   41 func_param: LPAREN RPAREN .
+
+    $default  reduce using rule 41 (func_param)
+
+
+State 138
+
+   42 func_param: LPAREN expr . func_param1 RPAREN
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
    75       | expr . MULT expr
@@ -2333,37 +2384,37 @@ State 136
    87       | expr . LT expr
    88       | expr . GT expr
 
-    COMMA   shift, and go to state 168
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
+    COMMA   shift, and go to state 170
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
 
-    $default  reduce using rule 42 (func_param1)
+    $default  reduce using rule 43 (func_param1)
 
-    func_param1  go to state 169
+    func_param1  go to state 171
 
 
-State 137
+State 139
 
    18 func_dcl: id var_dcl func_dcl1 COLON INDENT block . UNINDENT
 
-    UNINDENT  shift, and go to state 170
+    UNINDENT  shift, and go to state 172
 
 
-State 138
+State 140
 
    13 ts_dcl1: COMMA type LT const_int GT . ts_dcl1
 
@@ -2371,33 +2422,33 @@ State 138
 
     $default  reduce using rule 12 (ts_dcl1)
 
-    ts_dcl1  go to state 171
+    ts_dcl1  go to state 173
 
 
-State 139
+State 141
 
    11 ts_dcl: LBRACK type LT const_int GT ts_dcl1 RBRACK .
 
     $default  reduce using rule 11 (ts_dcl)
 
 
-State 140
+State 142
 
    16 func_dcl: ts_dcl id var_dcl func_dcl1 COLON INDENT block . UNINDENT
 
-    UNINDENT  shift, and go to state 172
+    UNINDENT  shift, and go to state 174
 
 
-State 141
+State 143
 
    64 expr: LPAREN expr RPAREN .
 
     $default  reduce using rule 64 (expr)
 
 
-State 142
+State 144
 
-   53 loop_stmt: WHILE expr COLON INDENT . block UNINDENT
+   54 while_stmt: WHILE expr COLON INDENT . block UNINDENT
 
     WHILE     shift, and go to state 46
     FOR       shift, and go to state 47
@@ -2411,7 +2462,7 @@ State 142
     $default  reduce using rule 22 (block1)
 
     var_dcl         go to state 53
-    block           go to state 173
+    block           go to state 175
     block1          go to state 55
     statement       go to state 56
     assignment      go to state 57
@@ -2419,13 +2470,14 @@ State 142
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
-State 143
+State 145
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2445,25 +2497,25 @@ State 143
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR     shift, and go to state 113
-    XOR    shift, and go to state 114
-    AND    shift, and go to state 115
-    EQEQ   shift, and go to state 116
-    NOTEQ  shift, and go to state 117
-    LT     shift, and go to state 118
-    LTEQ   shift, and go to state 119
-    GT     shift, and go to state 120
-    GTEQ   shift, and go to state 121
-    PLUS   shift, and go to state 122
-    MINUS  shift, and go to state 123
-    MULT   shift, and go to state 124
-    DIV    shift, and go to state 125
-    MOD    shift, and go to state 126
+    OR     shift, and go to state 115
+    XOR    shift, and go to state 116
+    AND    shift, and go to state 117
+    EQEQ   shift, and go to state 118
+    NOTEQ  shift, and go to state 119
+    LT     shift, and go to state 120
+    LTEQ   shift, and go to state 121
+    GT     shift, and go to state 122
+    GTEQ   shift, and go to state 123
+    PLUS   shift, and go to state 124
+    MINUS  shift, and go to state 125
+    MULT   shift, and go to state 126
+    DIV    shift, and go to state 127
+    MOD    shift, and go to state 128
 
     $default  reduce using rule 81 (bin_op)
 
 
-State 144
+State 146
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2483,25 +2535,25 @@ State 144
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR     shift, and go to state 113
-    XOR    shift, and go to state 114
-    AND    shift, and go to state 115
-    EQEQ   shift, and go to state 116
-    NOTEQ  shift, and go to state 117
-    LT     shift, and go to state 118
-    LTEQ   shift, and go to state 119
-    GT     shift, and go to state 120
-    GTEQ   shift, and go to state 121
-    PLUS   shift, and go to state 122
-    MINUS  shift, and go to state 123
-    MULT   shift, and go to state 124
-    DIV    shift, and go to state 125
-    MOD    shift, and go to state 126
+    OR     shift, and go to state 115
+    XOR    shift, and go to state 116
+    AND    shift, and go to state 117
+    EQEQ   shift, and go to state 118
+    NOTEQ  shift, and go to state 119
+    LT     shift, and go to state 120
+    LTEQ   shift, and go to state 121
+    GT     shift, and go to state 122
+    GTEQ   shift, and go to state 123
+    PLUS   shift, and go to state 124
+    MINUS  shift, and go to state 125
+    MULT   shift, and go to state 126
+    DIV    shift, and go to state 127
+    MOD    shift, and go to state 128
 
     $default  reduce using rule 82 (bin_op)
 
 
-State 145
+State 147
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2524,7 +2576,7 @@ State 145
     $default  reduce using rule 79 (bin_op)
 
 
-State 146
+State 148
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2547,7 +2599,7 @@ State 146
     $default  reduce using rule 80 (bin_op)
 
 
-State 147
+State 149
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2570,7 +2622,7 @@ State 147
     $default  reduce using rule 78 (bin_op)
 
 
-State 148
+State 150
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2590,23 +2642,23 @@ State 148
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR     shift, and go to state 113
-    XOR    shift, and go to state 114
-    AND    shift, and go to state 115
-    LT     shift, and go to state 118
-    LTEQ   shift, and go to state 119
-    GT     shift, and go to state 120
-    GTEQ   shift, and go to state 121
-    PLUS   shift, and go to state 122
-    MINUS  shift, and go to state 123
-    MULT   shift, and go to state 124
-    DIV    shift, and go to state 125
-    MOD    shift, and go to state 126
+    OR     shift, and go to state 115
+    XOR    shift, and go to state 116
+    AND    shift, and go to state 117
+    LT     shift, and go to state 120
+    LTEQ   shift, and go to state 121
+    GT     shift, and go to state 122
+    GTEQ   shift, and go to state 123
+    PLUS   shift, and go to state 124
+    MINUS  shift, and go to state 125
+    MULT   shift, and go to state 126
+    DIV    shift, and go to state 127
+    MOD    shift, and go to state 128
 
     $default  reduce using rule 83 (bin_op)
 
 
-State 149
+State 151
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2626,84 +2678,20 @@ State 149
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR     shift, and go to state 113
-    XOR    shift, and go to state 114
-    AND    shift, and go to state 115
-    LT     shift, and go to state 118
-    LTEQ   shift, and go to state 119
-    GT     shift, and go to state 120
-    GTEQ   shift, and go to state 121
-    PLUS   shift, and go to state 122
-    MINUS  shift, and go to state 123
-    MULT   shift, and go to state 124
-    DIV    shift, and go to state 125
-    MOD    shift, and go to state 126
+    OR     shift, and go to state 115
+    XOR    shift, and go to state 116
+    AND    shift, and go to state 117
+    LT     shift, and go to state 120
+    LTEQ   shift, and go to state 121
+    GT     shift, and go to state 122
+    GTEQ   shift, and go to state 123
+    PLUS   shift, and go to state 124
+    MINUS  shift, and go to state 125
+    MULT   shift, and go to state 126
+    DIV    shift, and go to state 127
+    MOD    shift, and go to state 128
 
     $default  reduce using rule 84 (bin_op)
-
-
-State 150
-
-   73 bin_op: expr . PLUS expr
-   74       | expr . MINUS expr
-   75       | expr . MULT expr
-   76       | expr . DIV expr
-   77       | expr . MOD expr
-   78       | expr . AND expr
-   79       | expr . OR expr
-   80       | expr . XOR expr
-   81       | expr . OROR expr
-   82       | expr . ANDAND expr
-   83       | expr . EQEQ expr
-   84       | expr . NOTEQ expr
-   85       | expr . GTEQ expr
-   86       | expr . LTEQ expr
-   87       | expr . LT expr
-   87       | expr LT expr .
-   88       | expr . GT expr
-
-    OR     shift, and go to state 113
-    XOR    shift, and go to state 114
-    AND    shift, and go to state 115
-    PLUS   shift, and go to state 122
-    MINUS  shift, and go to state 123
-    MULT   shift, and go to state 124
-    DIV    shift, and go to state 125
-    MOD    shift, and go to state 126
-
-    $default  reduce using rule 87 (bin_op)
-
-
-State 151
-
-   73 bin_op: expr . PLUS expr
-   74       | expr . MINUS expr
-   75       | expr . MULT expr
-   76       | expr . DIV expr
-   77       | expr . MOD expr
-   78       | expr . AND expr
-   79       | expr . OR expr
-   80       | expr . XOR expr
-   81       | expr . OROR expr
-   82       | expr . ANDAND expr
-   83       | expr . EQEQ expr
-   84       | expr . NOTEQ expr
-   85       | expr . GTEQ expr
-   86       | expr . LTEQ expr
-   86       | expr LTEQ expr .
-   87       | expr . LT expr
-   88       | expr . GT expr
-
-    OR     shift, and go to state 113
-    XOR    shift, and go to state 114
-    AND    shift, and go to state 115
-    PLUS   shift, and go to state 122
-    MINUS  shift, and go to state 123
-    MULT   shift, and go to state 124
-    DIV    shift, and go to state 125
-    MOD    shift, and go to state 126
-
-    $default  reduce using rule 86 (bin_op)
 
 
 State 152
@@ -2723,22 +2711,86 @@ State 152
    85       | expr . GTEQ expr
    86       | expr . LTEQ expr
    87       | expr . LT expr
+   87       | expr LT expr .
+   88       | expr . GT expr
+
+    OR     shift, and go to state 115
+    XOR    shift, and go to state 116
+    AND    shift, and go to state 117
+    PLUS   shift, and go to state 124
+    MINUS  shift, and go to state 125
+    MULT   shift, and go to state 126
+    DIV    shift, and go to state 127
+    MOD    shift, and go to state 128
+
+    $default  reduce using rule 87 (bin_op)
+
+
+State 153
+
+   73 bin_op: expr . PLUS expr
+   74       | expr . MINUS expr
+   75       | expr . MULT expr
+   76       | expr . DIV expr
+   77       | expr . MOD expr
+   78       | expr . AND expr
+   79       | expr . OR expr
+   80       | expr . XOR expr
+   81       | expr . OROR expr
+   82       | expr . ANDAND expr
+   83       | expr . EQEQ expr
+   84       | expr . NOTEQ expr
+   85       | expr . GTEQ expr
+   86       | expr . LTEQ expr
+   86       | expr LTEQ expr .
+   87       | expr . LT expr
+   88       | expr . GT expr
+
+    OR     shift, and go to state 115
+    XOR    shift, and go to state 116
+    AND    shift, and go to state 117
+    PLUS   shift, and go to state 124
+    MINUS  shift, and go to state 125
+    MULT   shift, and go to state 126
+    DIV    shift, and go to state 127
+    MOD    shift, and go to state 128
+
+    $default  reduce using rule 86 (bin_op)
+
+
+State 154
+
+   73 bin_op: expr . PLUS expr
+   74       | expr . MINUS expr
+   75       | expr . MULT expr
+   76       | expr . DIV expr
+   77       | expr . MOD expr
+   78       | expr . AND expr
+   79       | expr . OR expr
+   80       | expr . XOR expr
+   81       | expr . OROR expr
+   82       | expr . ANDAND expr
+   83       | expr . EQEQ expr
+   84       | expr . NOTEQ expr
+   85       | expr . GTEQ expr
+   86       | expr . LTEQ expr
+   87       | expr . LT expr
    88       | expr . GT expr
    88       | expr GT expr .
 
-    OR     shift, and go to state 113
-    XOR    shift, and go to state 114
-    AND    shift, and go to state 115
-    PLUS   shift, and go to state 122
-    MINUS  shift, and go to state 123
-    MULT   shift, and go to state 124
-    DIV    shift, and go to state 125
-    MOD    shift, and go to state 126
+    OR     shift, and go to state 115
+    XOR    shift, and go to state 116
+    AND    shift, and go to state 117
+    PLUS   shift, and go to state 124
+    MINUS  shift, and go to state 125
+    MULT   shift, and go to state 126
+    DIV    shift, and go to state 127
+    MOD    shift, and go to state 128
 
     $default  reduce using rule 88 (bin_op)
 
 
-State 153
+State 155
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2758,19 +2810,19 @@ State 153
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR     shift, and go to state 113
-    XOR    shift, and go to state 114
-    AND    shift, and go to state 115
-    PLUS   shift, and go to state 122
-    MINUS  shift, and go to state 123
-    MULT   shift, and go to state 124
-    DIV    shift, and go to state 125
-    MOD    shift, and go to state 126
+    OR     shift, and go to state 115
+    XOR    shift, and go to state 116
+    AND    shift, and go to state 117
+    PLUS   shift, and go to state 124
+    MINUS  shift, and go to state 125
+    MULT   shift, and go to state 126
+    DIV    shift, and go to state 127
+    MOD    shift, and go to state 128
 
     $default  reduce using rule 85 (bin_op)
 
 
-State 154
+State 156
 
    73 bin_op: expr . PLUS expr
    73       | expr PLUS expr .
@@ -2790,17 +2842,17 @@ State 154
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR    shift, and go to state 113
-    XOR   shift, and go to state 114
-    AND   shift, and go to state 115
-    MULT  shift, and go to state 124
-    DIV   shift, and go to state 125
-    MOD   shift, and go to state 126
+    OR    shift, and go to state 115
+    XOR   shift, and go to state 116
+    AND   shift, and go to state 117
+    MULT  shift, and go to state 126
+    DIV   shift, and go to state 127
+    MOD   shift, and go to state 128
 
     $default  reduce using rule 73 (bin_op)
 
 
-State 155
+State 157
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2820,17 +2872,17 @@ State 155
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR    shift, and go to state 113
-    XOR   shift, and go to state 114
-    AND   shift, and go to state 115
-    MULT  shift, and go to state 124
-    DIV   shift, and go to state 125
-    MOD   shift, and go to state 126
+    OR    shift, and go to state 115
+    XOR   shift, and go to state 116
+    AND   shift, and go to state 117
+    MULT  shift, and go to state 126
+    DIV   shift, and go to state 127
+    MOD   shift, and go to state 128
 
     $default  reduce using rule 74 (bin_op)
 
 
-State 156
+State 158
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2850,14 +2902,14 @@ State 156
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR   shift, and go to state 113
-    XOR  shift, and go to state 114
-    AND  shift, and go to state 115
+    OR   shift, and go to state 115
+    XOR  shift, and go to state 116
+    AND  shift, and go to state 117
 
     $default  reduce using rule 75 (bin_op)
 
 
-State 157
+State 159
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2877,14 +2929,14 @@ State 157
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR   shift, and go to state 113
-    XOR  shift, and go to state 114
-    AND  shift, and go to state 115
+    OR   shift, and go to state 115
+    XOR  shift, and go to state 116
+    AND  shift, and go to state 117
 
     $default  reduce using rule 76 (bin_op)
 
 
-State 158
+State 160
 
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
@@ -2904,43 +2956,43 @@ State 158
    87       | expr . LT expr
    88       | expr . GT expr
 
-    OR   shift, and go to state 113
-    XOR  shift, and go to state 114
-    AND  shift, and go to state 115
+    OR   shift, and go to state 115
+    XOR  shift, and go to state 116
+    AND  shift, and go to state 117
 
     $default  reduce using rule 77 (bin_op)
 
 
-State 159
+State 161
 
-   56 loop_stmt1: RANGE . loop_stmt2
-   57           | RANGE . loop_stmt2 TO loop_stmt2
+   56 for_stmt1: RANGE . for_stmt2
+   57          | RANGE . for_stmt2 TO for_stmt2
 
     ID         shift, and go to state 4
     CONST_INT  shift, and go to state 41
 
-    loop_stmt2  go to state 174
-    const_int   go to state 175
-    id          go to state 176
-
-
-State 160
-
-   52 loop_stmt: FOR id IN loop_stmt1 . COLON INDENT block UNINDENT
-
-    COLON  shift, and go to state 177
-
-
-State 161
-
-   55 loop_stmt1: id .
-
-    $default  reduce using rule 55 (loop_stmt1)
+    for_stmt2  go to state 176
+    const_int  go to state 177
+    id         go to state 178
 
 
 State 162
 
-   44 if_stmt: IF expr COLON INDENT . block UNINDENT if_stmt1
+   53 for_stmt: FOR id IN for_stmt1 . COLON INDENT block UNINDENT
+
+    COLON  shift, and go to state 179
+
+
+State 163
+
+   55 for_stmt1: id .
+
+    $default  reduce using rule 55 (for_stmt1)
+
+
+State 164
+
+   45 if_stmt: IF expr COLON INDENT . block UNINDENT if_stmt1
 
     WHILE     shift, and go to state 46
     FOR       shift, and go to state 47
@@ -2954,7 +3006,7 @@ State 162
     $default  reduce using rule 22 (block1)
 
     var_dcl         go to state 53
-    block           go to state 178
+    block           go to state 180
     block1          go to state 55
     statement       go to state 56
     assignment      go to state 57
@@ -2962,251 +3014,207 @@ State 162
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
-
-
-State 163
-
-   48 case_stmt: CASE expr COLON INDENT . case_stmt1 UNINDENT
-   49          | CASE expr COLON INDENT . case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
-
-    CONST_INT  shift, and go to state 41
-
-    $default  reduce using rule 50 (case_stmt1)
-
-    case_stmt1  go to state 179
-    const_int   go to state 180
-
-
-State 164
-
-   63 id1: COMMA id . id1
-
-    COMMA  shift, and go to state 131
-
-    $default  reduce using rule 62 (id1)
-
-    id1  go to state 181
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
 State 165
 
-   38 expr1: COMMA . expr expr1
+   49 case_stmt: CASE expr COLON INDENT . case_stmt1 UNINDENT
+   50          | CASE expr COLON INDENT . case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
-    ID            shift, and go to state 4
-    CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
+    CONST_INT   shift, and go to state 41
+    CONST_CHAR  shift, and go to state 79
+    CONST_LONG  shift, and go to state 81
 
-    func_call  go to state 83
-    expr       go to state 182
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    $default  reduce using rule 51 (case_stmt1)
+
+    case_stmt1     go to state 181
+    const_int_val  go to state 182
+    const_int      go to state 89
 
 
 State 166
 
-   33 assignment: assignment_lhs EQ expr expr1 .
+   63 id1: COMMA id . id1
 
-    $default  reduce using rule 33 (assignment)
+    COMMA  shift, and go to state 133
+
+    $default  reduce using rule 62 (id1)
+
+    id1  go to state 183
 
 
 State 167
 
-  104 array: id LBRACK expr expr1 . RBRACK
+   39 expr1: COMMA . expr expr1
 
-    RBRACK  shift, and go to state 183
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
+    ID            shift, and go to state 4
+    CONST_INT     shift, and go to state 41
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
+
+    func_call      go to state 84
+    expr           go to state 184
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
 
 
 State 168
 
-   43 func_param1: COMMA . expr func_param1
+   34 assignment: assignment_lhs EQ expr expr1 .
 
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
-    ID            shift, and go to state 4
-    CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
-
-    func_call  go to state 83
-    expr       go to state 184
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
+    $default  reduce using rule 34 (assignment)
 
 
 State 169
 
-   41 func_param: LPAREN expr func_param1 . RPAREN
+  105 array: id LBRACK expr expr1 . RBRACK
 
-    RPAREN  shift, and go to state 185
+    RBRACK  shift, and go to state 185
 
 
 State 170
+
+   44 func_param1: COMMA . expr func_param1
+
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
+    ID            shift, and go to state 4
+    CONST_INT     shift, and go to state 41
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
+
+    func_call      go to state 84
+    expr           go to state 186
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
+
+
+State 171
+
+   42 func_param: LPAREN expr func_param1 . RPAREN
+
+    RPAREN  shift, and go to state 187
+
+
+State 172
 
    18 func_dcl: id var_dcl func_dcl1 COLON INDENT block UNINDENT .
 
     $default  reduce using rule 18 (func_dcl)
 
 
-State 171
+State 173
 
    13 ts_dcl1: COMMA type LT const_int GT ts_dcl1 .
 
     $default  reduce using rule 13 (ts_dcl1)
 
 
-State 172
+State 174
 
    16 func_dcl: ts_dcl id var_dcl func_dcl1 COLON INDENT block UNINDENT .
 
     $default  reduce using rule 16 (func_dcl)
 
 
-State 173
-
-   53 loop_stmt: WHILE expr COLON INDENT block . UNINDENT
-
-    UNINDENT  shift, and go to state 186
-
-
-State 174
-
-   56 loop_stmt1: RANGE loop_stmt2 .
-   57           | RANGE loop_stmt2 . TO loop_stmt2
-
-    TO  shift, and go to state 187
-
-    $default  reduce using rule 56 (loop_stmt1)
-
-
 State 175
 
-   58 loop_stmt2: const_int .
+   54 while_stmt: WHILE expr COLON INDENT block . UNINDENT
 
-    $default  reduce using rule 58 (loop_stmt2)
+    UNINDENT  shift, and go to state 188
 
 
 State 176
 
-   59 loop_stmt2: id .
+   56 for_stmt1: RANGE for_stmt2 .
+   57          | RANGE for_stmt2 . TO for_stmt2
 
-    $default  reduce using rule 59 (loop_stmt2)
+    TO  shift, and go to state 189
+
+    $default  reduce using rule 56 (for_stmt1)
 
 
 State 177
 
-   52 loop_stmt: FOR id IN loop_stmt1 COLON . INDENT block UNINDENT
+   58 for_stmt2: const_int .
 
-    INDENT  shift, and go to state 188
+    $default  reduce using rule 58 (for_stmt2)
 
 
 State 178
 
-   44 if_stmt: IF expr COLON INDENT block . UNINDENT if_stmt1
+   59 for_stmt2: id .
 
-    UNINDENT  shift, and go to state 189
+    $default  reduce using rule 59 (for_stmt2)
 
 
 State 179
 
-   48 case_stmt: CASE expr COLON INDENT case_stmt1 . UNINDENT
-   49          | CASE expr COLON INDENT case_stmt1 . DEFAULT COLON INDENT block UNINDENT UNINDENT
+   53 for_stmt: FOR id IN for_stmt1 COLON . INDENT block UNINDENT
 
-    UNINDENT  shift, and go to state 190
-    DEFAULT   shift, and go to state 191
+    INDENT  shift, and go to state 190
 
 
 State 180
 
-   51 case_stmt1: const_int . COLON INDENT block UNINDENT case_stmt1
+   45 if_stmt: IF expr COLON INDENT block . UNINDENT if_stmt1
 
-    COLON  shift, and go to state 192
+    UNINDENT  shift, and go to state 191
 
 
 State 181
+
+   49 case_stmt: CASE expr COLON INDENT case_stmt1 . UNINDENT
+   50          | CASE expr COLON INDENT case_stmt1 . DEFAULT COLON INDENT block UNINDENT UNINDENT
+
+    UNINDENT  shift, and go to state 192
+    DEFAULT   shift, and go to state 193
+
+
+State 182
+
+   52 case_stmt1: const_int_val . COLON INDENT block UNINDENT case_stmt1
+
+    COLON  shift, and go to state 194
+
+
+State 183
 
    63 id1: COMMA id id1 .
 
     $default  reduce using rule 63 (id1)
 
 
-State 182
-
-   38 expr1: COMMA expr . expr1
-   73 bin_op: expr . PLUS expr
-   74       | expr . MINUS expr
-   75       | expr . MULT expr
-   76       | expr . DIV expr
-   77       | expr . MOD expr
-   78       | expr . AND expr
-   79       | expr . OR expr
-   80       | expr . XOR expr
-   81       | expr . OROR expr
-   82       | expr . ANDAND expr
-   83       | expr . EQEQ expr
-   84       | expr . NOTEQ expr
-   85       | expr . GTEQ expr
-   86       | expr . LTEQ expr
-   87       | expr . LT expr
-   88       | expr . GT expr
-
-    COMMA   shift, and go to state 165
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
-
-    $default  reduce using rule 37 (expr1)
-
-    expr1  go to state 193
-
-
-State 183
-
-  104 array: id LBRACK expr expr1 RBRACK .
-
-    $default  reduce using rule 104 (array)
-
-
 State 184
 
-   43 func_param1: COMMA expr . func_param1
+   39 expr1: COMMA expr . expr1
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
    75       | expr . MULT expr
@@ -3224,240 +3232,39 @@ State 184
    87       | expr . LT expr
    88       | expr . GT expr
 
-    COMMA   shift, and go to state 168
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
+    COMMA   shift, and go to state 167
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
 
-    $default  reduce using rule 42 (func_param1)
+    $default  reduce using rule 38 (expr1)
 
-    func_param1  go to state 194
+    expr1  go to state 195
 
 
 State 185
 
-   41 func_param: LPAREN expr func_param1 RPAREN .
+  105 array: id LBRACK expr expr1 RBRACK .
 
-    $default  reduce using rule 41 (func_param)
+    $default  reduce using rule 105 (array)
 
 
 State 186
 
-   53 loop_stmt: WHILE expr COLON INDENT block UNINDENT .
-
-    $default  reduce using rule 53 (loop_stmt)
-
-
-State 187
-
-   57 loop_stmt1: RANGE loop_stmt2 TO . loop_stmt2
-
-    ID         shift, and go to state 4
-    CONST_INT  shift, and go to state 41
-
-    loop_stmt2  go to state 195
-    const_int   go to state 175
-    id          go to state 176
-
-
-State 188
-
-   52 loop_stmt: FOR id IN loop_stmt1 COLON INDENT . block UNINDENT
-
-    WHILE     shift, and go to state 46
-    FOR       shift, and go to state 47
-    BREAK     shift, and go to state 48
-    CONTINUE  shift, and go to state 49
-    IF        shift, and go to state 50
-    CASE      shift, and go to state 51
-    RETURN    shift, and go to state 52
-    ID        shift, and go to state 4
-
-    $default  reduce using rule 22 (block1)
-
-    var_dcl         go to state 53
-    block           go to state 196
-    block1          go to state 55
-    statement       go to state 56
-    assignment      go to state 57
-    assignment_lhs  go to state 58
-    func_call       go to state 59
-    if_stmt         go to state 60
-    case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
-
-
-State 189
-
-   44 if_stmt: IF expr COLON INDENT block UNINDENT . if_stmt1
-
-    ELSE  shift, and go to state 197
-    ELIF  shift, and go to state 198
-
-    $default  reduce using rule 45 (if_stmt1)
-
-    if_stmt1  go to state 199
-
-
-State 190
-
-   48 case_stmt: CASE expr COLON INDENT case_stmt1 UNINDENT .
-
-    $default  reduce using rule 48 (case_stmt)
-
-
-State 191
-
-   49 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT . COLON INDENT block UNINDENT UNINDENT
-
-    COLON  shift, and go to state 200
-
-
-State 192
-
-   51 case_stmt1: const_int COLON . INDENT block UNINDENT case_stmt1
-
-    INDENT  shift, and go to state 201
-
-
-State 193
-
-   38 expr1: COMMA expr expr1 .
-
-    $default  reduce using rule 38 (expr1)
-
-
-State 194
-
-   43 func_param1: COMMA expr func_param1 .
-
-    $default  reduce using rule 43 (func_param1)
-
-
-State 195
-
-   57 loop_stmt1: RANGE loop_stmt2 TO loop_stmt2 .
-
-    $default  reduce using rule 57 (loop_stmt1)
-
-
-State 196
-
-   52 loop_stmt: FOR id IN loop_stmt1 COLON INDENT block . UNINDENT
-
-    UNINDENT  shift, and go to state 202
-
-
-State 197
-
-   46 if_stmt1: ELSE . COLON INDENT block UNINDENT
-
-    COLON  shift, and go to state 203
-
-
-State 198
-
-   47 if_stmt1: ELIF . expr COLON INDENT block UNINDENT if_stmt1
-
-    NOT           shift, and go to state 73
-    MINUS         shift, and go to state 74
-    COMP          shift, and go to state 75
-    LPAREN        shift, and go to state 76
-    ID            shift, and go to state 4
-    CONST_INT     shift, and go to state 41
-    CONST_REAL    shift, and go to state 77
-    CONST_CHAR    shift, and go to state 78
-    CONST_STRING  shift, and go to state 79
-    CONST_LONG    shift, and go to state 80
-    TRUE          shift, and go to state 81
-    FALSE         shift, and go to state 82
-
-    func_call  go to state 83
-    expr       go to state 204
-    bin_op     go to state 85
-    const_val  go to state 86
-    const_int  go to state 87
-    id         go to state 88
-    array      go to state 89
-
-
-State 199
-
-   44 if_stmt: IF expr COLON INDENT block UNINDENT if_stmt1 .
-
-    $default  reduce using rule 44 (if_stmt)
-
-
-State 200
-
-   49 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON . INDENT block UNINDENT UNINDENT
-
-    INDENT  shift, and go to state 205
-
-
-State 201
-
-   51 case_stmt1: const_int COLON INDENT . block UNINDENT case_stmt1
-
-    WHILE     shift, and go to state 46
-    FOR       shift, and go to state 47
-    BREAK     shift, and go to state 48
-    CONTINUE  shift, and go to state 49
-    IF        shift, and go to state 50
-    CASE      shift, and go to state 51
-    RETURN    shift, and go to state 52
-    ID        shift, and go to state 4
-
-    $default  reduce using rule 22 (block1)
-
-    var_dcl         go to state 53
-    block           go to state 206
-    block1          go to state 55
-    statement       go to state 56
-    assignment      go to state 57
-    assignment_lhs  go to state 58
-    func_call       go to state 59
-    if_stmt         go to state 60
-    case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
-
-
-State 202
-
-   52 loop_stmt: FOR id IN loop_stmt1 COLON INDENT block UNINDENT .
-
-    $default  reduce using rule 52 (loop_stmt)
-
-
-State 203
-
-   46 if_stmt1: ELSE COLON . INDENT block UNINDENT
-
-    INDENT  shift, and go to state 207
-
-
-State 204
-
-   47 if_stmt1: ELIF expr . COLON INDENT block UNINDENT if_stmt1
+   44 func_param1: COMMA expr . func_param1
    73 bin_op: expr . PLUS expr
    74       | expr . MINUS expr
    75       | expr . MULT expr
@@ -3475,28 +3282,58 @@ State 204
    87       | expr . LT expr
    88       | expr . GT expr
 
-    COLON   shift, and go to state 208
-    OROR    shift, and go to state 111
-    ANDAND  shift, and go to state 112
-    OR      shift, and go to state 113
-    XOR     shift, and go to state 114
-    AND     shift, and go to state 115
-    EQEQ    shift, and go to state 116
-    NOTEQ   shift, and go to state 117
-    LT      shift, and go to state 118
-    LTEQ    shift, and go to state 119
-    GT      shift, and go to state 120
-    GTEQ    shift, and go to state 121
-    PLUS    shift, and go to state 122
-    MINUS   shift, and go to state 123
-    MULT    shift, and go to state 124
-    DIV     shift, and go to state 125
-    MOD     shift, and go to state 126
+    COMMA   shift, and go to state 170
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
+
+    $default  reduce using rule 43 (func_param1)
+
+    func_param1  go to state 196
 
 
-State 205
+State 187
 
-   49 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT . block UNINDENT UNINDENT
+   42 func_param: LPAREN expr func_param1 RPAREN .
+
+    $default  reduce using rule 42 (func_param)
+
+
+State 188
+
+   54 while_stmt: WHILE expr COLON INDENT block UNINDENT .
+
+    $default  reduce using rule 54 (while_stmt)
+
+
+State 189
+
+   57 for_stmt1: RANGE for_stmt2 TO . for_stmt2
+
+    ID         shift, and go to state 4
+    CONST_INT  shift, and go to state 41
+
+    for_stmt2  go to state 197
+    const_int  go to state 177
+    id         go to state 178
+
+
+State 190
+
+   53 for_stmt: FOR id IN for_stmt1 COLON INDENT . block UNINDENT
 
     WHILE     shift, and go to state 46
     FOR       shift, and go to state 47
@@ -3510,7 +3347,7 @@ State 205
     $default  reduce using rule 22 (block1)
 
     var_dcl         go to state 53
-    block           go to state 209
+    block           go to state 198
     block1          go to state 55
     statement       go to state 56
     assignment      go to state 57
@@ -3518,22 +3355,209 @@ State 205
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
+
+
+State 191
+
+   45 if_stmt: IF expr COLON INDENT block UNINDENT . if_stmt1
+
+    ELSE  shift, and go to state 199
+    ELIF  shift, and go to state 200
+
+    $default  reduce using rule 46 (if_stmt1)
+
+    if_stmt1  go to state 201
+
+
+State 192
+
+   49 case_stmt: CASE expr COLON INDENT case_stmt1 UNINDENT .
+
+    $default  reduce using rule 49 (case_stmt)
+
+
+State 193
+
+   50 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT . COLON INDENT block UNINDENT UNINDENT
+
+    COLON  shift, and go to state 202
+
+
+State 194
+
+   52 case_stmt1: const_int_val COLON . INDENT block UNINDENT case_stmt1
+
+    INDENT  shift, and go to state 203
+
+
+State 195
+
+   39 expr1: COMMA expr expr1 .
+
+    $default  reduce using rule 39 (expr1)
+
+
+State 196
+
+   44 func_param1: COMMA expr func_param1 .
+
+    $default  reduce using rule 44 (func_param1)
+
+
+State 197
+
+   57 for_stmt1: RANGE for_stmt2 TO for_stmt2 .
+
+    $default  reduce using rule 57 (for_stmt1)
+
+
+State 198
+
+   53 for_stmt: FOR id IN for_stmt1 COLON INDENT block . UNINDENT
+
+    UNINDENT  shift, and go to state 204
+
+
+State 199
+
+   47 if_stmt1: ELSE . COLON INDENT block UNINDENT
+
+    COLON  shift, and go to state 205
+
+
+State 200
+
+   48 if_stmt1: ELIF . expr COLON INDENT block UNINDENT if_stmt1
+
+    NOT           shift, and go to state 74
+    MINUS         shift, and go to state 75
+    COMP          shift, and go to state 76
+    LPAREN        shift, and go to state 77
+    ID            shift, and go to state 4
+    CONST_INT     shift, and go to state 41
+    CONST_REAL    shift, and go to state 78
+    CONST_CHAR    shift, and go to state 79
+    CONST_STRING  shift, and go to state 80
+    CONST_LONG    shift, and go to state 81
+    TRUE          shift, and go to state 82
+    FALSE         shift, and go to state 83
+
+    func_call      go to state 84
+    expr           go to state 206
+    bin_op         go to state 86
+    const_val      go to state 87
+    const_int_val  go to state 88
+    const_int      go to state 89
+    id             go to state 90
+    array          go to state 91
+
+
+State 201
+
+   45 if_stmt: IF expr COLON INDENT block UNINDENT if_stmt1 .
+
+    $default  reduce using rule 45 (if_stmt)
+
+
+State 202
+
+   50 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON . INDENT block UNINDENT UNINDENT
+
+    INDENT  shift, and go to state 207
+
+
+State 203
+
+   52 case_stmt1: const_int_val COLON INDENT . block UNINDENT case_stmt1
+
+    WHILE     shift, and go to state 46
+    FOR       shift, and go to state 47
+    BREAK     shift, and go to state 48
+    CONTINUE  shift, and go to state 49
+    IF        shift, and go to state 50
+    CASE      shift, and go to state 51
+    RETURN    shift, and go to state 52
+    ID        shift, and go to state 4
+
+    $default  reduce using rule 22 (block1)
+
+    var_dcl         go to state 53
+    block           go to state 208
+    block1          go to state 55
+    statement       go to state 56
+    assignment      go to state 57
+    assignment_lhs  go to state 58
+    func_call       go to state 59
+    if_stmt         go to state 60
+    case_stmt       go to state 61
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
+
+
+State 204
+
+   53 for_stmt: FOR id IN for_stmt1 COLON INDENT block UNINDENT .
+
+    $default  reduce using rule 53 (for_stmt)
+
+
+State 205
+
+   47 if_stmt1: ELSE COLON . INDENT block UNINDENT
+
+    INDENT  shift, and go to state 209
 
 
 State 206
 
-   51 case_stmt1: const_int COLON INDENT block . UNINDENT case_stmt1
+   48 if_stmt1: ELIF expr . COLON INDENT block UNINDENT if_stmt1
+   73 bin_op: expr . PLUS expr
+   74       | expr . MINUS expr
+   75       | expr . MULT expr
+   76       | expr . DIV expr
+   77       | expr . MOD expr
+   78       | expr . AND expr
+   79       | expr . OR expr
+   80       | expr . XOR expr
+   81       | expr . OROR expr
+   82       | expr . ANDAND expr
+   83       | expr . EQEQ expr
+   84       | expr . NOTEQ expr
+   85       | expr . GTEQ expr
+   86       | expr . LTEQ expr
+   87       | expr . LT expr
+   88       | expr . GT expr
 
-    UNINDENT  shift, and go to state 210
+    COLON   shift, and go to state 210
+    OROR    shift, and go to state 113
+    ANDAND  shift, and go to state 114
+    OR      shift, and go to state 115
+    XOR     shift, and go to state 116
+    AND     shift, and go to state 117
+    EQEQ    shift, and go to state 118
+    NOTEQ   shift, and go to state 119
+    LT      shift, and go to state 120
+    LTEQ    shift, and go to state 121
+    GT      shift, and go to state 122
+    GTEQ    shift, and go to state 123
+    PLUS    shift, and go to state 124
+    MINUS   shift, and go to state 125
+    MULT    shift, and go to state 126
+    DIV     shift, and go to state 127
+    MOD     shift, and go to state 128
 
 
 State 207
 
-   46 if_stmt1: ELSE COLON INDENT . block UNINDENT
+   50 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT . block UNINDENT UNINDENT
 
     WHILE     shift, and go to state 46
     FOR       shift, and go to state 47
@@ -3555,48 +3579,23 @@ State 207
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
 State 208
 
-   47 if_stmt1: ELIF expr COLON . INDENT block UNINDENT if_stmt1
+   52 case_stmt1: const_int_val COLON INDENT block . UNINDENT case_stmt1
 
-    INDENT  shift, and go to state 212
+    UNINDENT  shift, and go to state 212
 
 
 State 209
 
-   49 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block . UNINDENT UNINDENT
-
-    UNINDENT  shift, and go to state 213
-
-
-State 210
-
-   51 case_stmt1: const_int COLON INDENT block UNINDENT . case_stmt1
-
-    CONST_INT  shift, and go to state 41
-
-    $default  reduce using rule 50 (case_stmt1)
-
-    case_stmt1  go to state 214
-    const_int   go to state 180
-
-
-State 211
-
-   46 if_stmt1: ELSE COLON INDENT block . UNINDENT
-
-    UNINDENT  shift, and go to state 215
-
-
-State 212
-
-   47 if_stmt1: ELIF expr COLON INDENT . block UNINDENT if_stmt1
+   47 if_stmt1: ELSE COLON INDENT . block UNINDENT
 
     WHILE     shift, and go to state 46
     FOR       shift, and go to state 47
@@ -3610,7 +3609,7 @@ State 212
     $default  reduce using rule 22 (block1)
 
     var_dcl         go to state 53
-    block           go to state 216
+    block           go to state 213
     block1          go to state 55
     statement       go to state 56
     assignment      go to state 57
@@ -3618,61 +3617,129 @@ State 212
     func_call       go to state 59
     if_stmt         go to state 60
     case_stmt       go to state 61
-    loop_stmt       go to state 62
-    return_stmt     go to state 63
-    id              go to state 64
-    array           go to state 65
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
+
+
+State 210
+
+   48 if_stmt1: ELIF expr COLON . INDENT block UNINDENT if_stmt1
+
+    INDENT  shift, and go to state 214
+
+
+State 211
+
+   50 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block . UNINDENT UNINDENT
+
+    UNINDENT  shift, and go to state 215
+
+
+State 212
+
+   52 case_stmt1: const_int_val COLON INDENT block UNINDENT . case_stmt1
+
+    CONST_INT   shift, and go to state 41
+    CONST_CHAR  shift, and go to state 79
+    CONST_LONG  shift, and go to state 81
+
+    $default  reduce using rule 51 (case_stmt1)
+
+    case_stmt1     go to state 216
+    const_int_val  go to state 182
+    const_int      go to state 89
 
 
 State 213
 
-   49 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT . UNINDENT
+   47 if_stmt1: ELSE COLON INDENT block . UNINDENT
 
     UNINDENT  shift, and go to state 217
 
 
 State 214
 
-   51 case_stmt1: const_int COLON INDENT block UNINDENT case_stmt1 .
+   48 if_stmt1: ELIF expr COLON INDENT . block UNINDENT if_stmt1
 
-    $default  reduce using rule 51 (case_stmt1)
+    WHILE     shift, and go to state 46
+    FOR       shift, and go to state 47
+    BREAK     shift, and go to state 48
+    CONTINUE  shift, and go to state 49
+    IF        shift, and go to state 50
+    CASE      shift, and go to state 51
+    RETURN    shift, and go to state 52
+    ID        shift, and go to state 4
+
+    $default  reduce using rule 22 (block1)
+
+    var_dcl         go to state 53
+    block           go to state 218
+    block1          go to state 55
+    statement       go to state 56
+    assignment      go to state 57
+    assignment_lhs  go to state 58
+    func_call       go to state 59
+    if_stmt         go to state 60
+    case_stmt       go to state 61
+    for_stmt        go to state 62
+    while_stmt      go to state 63
+    return_stmt     go to state 64
+    id              go to state 65
+    array           go to state 66
 
 
 State 215
 
-   46 if_stmt1: ELSE COLON INDENT block UNINDENT .
+   50 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT . UNINDENT
 
-    $default  reduce using rule 46 (if_stmt1)
+    UNINDENT  shift, and go to state 219
 
 
 State 216
 
-   47 if_stmt1: ELIF expr COLON INDENT block . UNINDENT if_stmt1
+   52 case_stmt1: const_int_val COLON INDENT block UNINDENT case_stmt1 .
 
-    UNINDENT  shift, and go to state 218
+    $default  reduce using rule 52 (case_stmt1)
 
 
 State 217
 
-   49 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT .
+   47 if_stmt1: ELSE COLON INDENT block UNINDENT .
 
-    $default  reduce using rule 49 (case_stmt)
+    $default  reduce using rule 47 (if_stmt1)
 
 
 State 218
 
-   47 if_stmt1: ELIF expr COLON INDENT block UNINDENT . if_stmt1
+   48 if_stmt1: ELIF expr COLON INDENT block . UNINDENT if_stmt1
 
-    ELSE  shift, and go to state 197
-    ELIF  shift, and go to state 198
-
-    $default  reduce using rule 45 (if_stmt1)
-
-    if_stmt1  go to state 219
+    UNINDENT  shift, and go to state 220
 
 
 State 219
 
-   47 if_stmt1: ELIF expr COLON INDENT block UNINDENT if_stmt1 .
+   50 case_stmt: CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block UNINDENT UNINDENT .
 
-    $default  reduce using rule 47 (if_stmt1)
+    $default  reduce using rule 50 (case_stmt)
+
+
+State 220
+
+   48 if_stmt1: ELIF expr COLON INDENT block UNINDENT . if_stmt1
+
+    ELSE  shift, and go to state 199
+    ELIF  shift, and go to state 200
+
+    $default  reduce using rule 46 (if_stmt1)
+
+    if_stmt1  go to state 221
+
+
+State 221
+
+   48 if_stmt1: ELIF expr COLON INDENT block UNINDENT if_stmt1 .
+
+    $default  reduce using rule 48 (if_stmt1)

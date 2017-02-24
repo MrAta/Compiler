@@ -53,6 +53,7 @@ long lval;
 #if TEST_MODE > TEST_PARSER
 	Node *node;
 	NExpression *expr;
+	NConst *const_int_val;
 	NInteger *const_int;
 	NConst *const_val;
 	NIdentifier *ident;
@@ -75,6 +76,10 @@ long lval;
 	CaseList *caze_l;
 	NSwitch *swtch;
 	NIf *iff;
+	NForRangeOperand *forr_it_op;
+	NForIterator *forr_it;
+	NFor *forr;
+	NWhile *whilee;
 	VariableList *var_l;
 	NFunctionDecl *funcd;
 	DeclarationList *dec_l;
@@ -153,9 +158,10 @@ long lval;
 %type <caze_l> case_stmt1
 %type <iff> if_stmt
 %type <blk> if_stmt1
-%type <token> loop_stmt 
-%type <token> loop_stmt1
-%type <token> loop_stmt2
+%type <forr> for_stmt 
+%type <forr_it> for_stmt1
+%type <forr_it_op> for_stmt2
+%type <whilee> while_stmt 
 %type <expr> expr
 %type <expr_l> expr1
 %type <ident_l> id1
@@ -168,6 +174,7 @@ long lval;
 %type <bin_op> bin_op
 %type <const_val> const_val 
 %type <const_int> const_int
+%type <const_int_val> const_int_val
 %type <ident> id
 %type <arr> array
 %type <token> type
@@ -395,7 +402,16 @@ $$=$1;
 $$=$1;
 #endif
 }						
-	| loop_stmt
+	| for_stmt						{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
+	| while_stmt						{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
 	| return_stmt						{
 #if TEST_MODE > TEST_PARSER
 $$=$1;
@@ -541,13 +557,13 @@ case_stmt :
 	CASE expr COLON INDENT case_stmt1 UNINDENT		{
 #if TEST_MODE > TEST_PARSER
 //$5->Expression = $2; $$ = $5;
-$$ = new NSwitch(*$2, *$5, NULL);
+$$ = new NSwitch(*$2, *$5, *(new NCaseDefault()));
 #endif
 }
 	| CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block	UNINDENT UNINDENT
 								{
 #if TEST_MODE > TEST_PARSER
-$$ = new NSwitch(*$2, *$5, new NCaseDefault(*$9));
+$$ = new NSwitch(*$2, *$5, *(new NCaseDefault(*$9)));
 //$5->ebl.push_back(new ExprBlock(new NBool(true), $9)); $5->Expression = $2; $$ = $5;
 //$5->ebl.emplace_back(new NBool(true), $9); $5->Expression = $2; $$ = $5;
 #endif
@@ -559,7 +575,7 @@ case_stmt1 : 							{
 $$ = new CaseList();
 #endif
 }
-	| const_int COLON INDENT block UNINDENT case_stmt1	{
+	| const_int_val COLON INDENT block UNINDENT case_stmt1	{
 #if TEST_MODE > TEST_PARSER
 $6->push_back(new NCase(*$1, *$4)); $$ = $6;
 //$6->ebl.emplace_back($1, $4); $$ = $6;
@@ -567,55 +583,54 @@ $6->push_back(new NCase(*$1, *$4)); $$ = $6;
 }
 ;
 
-loop_stmt :
+for_stmt :
 //	  FOR id IN COLON block
-	  FOR id IN loop_stmt1 COLON INDENT block UNINDENT	{
-#if 0 && TEST_MODE > TEST_PARSER
-$4->id = $2; $4->block = $7; $$ = $4;
+	  FOR id IN for_stmt1 COLON INDENT block UNINDENT	{
+#if TEST_MODE > TEST_PARSER
+$$ = new NFor(*$2, *$4, *$7);
 #endif
 }		//new NFor(NIdentifier id, NExpression range, NBlock block);
-	| WHILE expr COLON INDENT block	UNINDENT		{
-#if 0 && TEST_MODE > TEST_PARSER
+;
+
+while_stmt:
+	  WHILE expr COLON INDENT block UNINDENT		{
+#if TEST_MODE > TEST_PARSER
 $$ = new NWhile(*$2, *$5);
 #endif
 }		//new NWhile(NExpression condition, NBlock block);
 ;
 
-loop_stmt1 :							{
+for_stmt1 :/*							{
 #if 0 && TEST_MODE > TEST_PARSER
 $$ = new NFor(NULL, NULL, 1);
 #endif
 }
-	| id							{
-#if 0 && TEST_MODE > TEST_PARSER
-$$ = new NFor($1, NULL, 2);
+	|*/ id							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NForEach(*$1);
 #endif
 }
-	| RANGE loop_stmt2					{
-#if 0 && TEST_MODE > TEST_PARSER
-$$ = new NFor($2, NULL, 3);
+	| RANGE for_stmt2					{
+#if TEST_MODE > TEST_PARSER
+$$ = new NForRange(*(new NInteger(0)), *$2);
 #endif
 }
-	| RANGE loop_stmt2 TO loop_stmt2			{
-#if 0 && TEST_MODE > TEST_PARSER && 0
-$$ = new NFor($2, $4, 4);
+	| RANGE for_stmt2 TO for_stmt2			{
+#if TEST_MODE > TEST_PARSER
+$$ = new NForRange(*$2, *$4);
 #endif
 }
 ;
-loop_stmt2 :							/*{
+for_stmt2 :							/*{
 #if 0 && TEST_MODE > TEST_PARSER
 $$ = new NBlank();
 #endif
 }
 	|*/const_int						{
-#if 0
-$<expr>$ = $1;
-#endif
+$$ = $1;
 }
 	| id							{
-#if 0
-$<expr>$ = $1;
-#endif
+$$ = $1;
 }
 ;
 
@@ -672,8 +687,9 @@ $$ = $2;
 #endif
 }
 	| func_call		{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 //$$ = new NExpression(*$1);
+$$ = $1;
 #endif
 }
 	| id			{
@@ -792,7 +808,7 @@ $$ = new NBinaryOp(*$1, $2, *$3);
 ;
 
 const_val : 
-	  const_int		{
+	  const_int_val		{
 #if TEST_MODE > TEST_PARSER
 $$ = $1;
 #endif
@@ -800,11 +816,6 @@ $$ = $1;
 	| CONST_REAL 		{
 #if TEST_MODE > TEST_PARSER
 $$ = new NReal( atof($1->c_str() ) ); delete $1;
-#endif
-}
-	| CONST_CHAR 		{
-#if TEST_MODE > TEST_PARSER
-$$ = new NChar($1->c_str()[0]); delete $1;
 #endif
 }
 	| TRUE			{
@@ -822,17 +833,32 @@ $$ = new NBool(false); delete $1;
 $$ = new NString(*$1); delete $1;
 #endif
 }
-	| CONST_LONG 		{
-#if TEST_MODE > TEST_PARSER
-$$ = new NLong( atol($1->c_str()) ); delete $1;
-#endif
-}
 ;
 
 type : BOOL | INT | LONG | CHAR | REAL | STRING
 ;
 
-const_int : CONST_INT		{
+const_int_val :
+	  const_int		{
+#if TEST_MODE > TEST_PARSER
+$$ = $1;
+#endif
+}
+	| CONST_CHAR 		{
+#if TEST_MODE > TEST_PARSER
+$$ = new NChar($1->c_str()[1]); delete $1;
+#endif
+}
+	| CONST_LONG 		{
+#if TEST_MODE > TEST_PARSER
+$$ = new NLong( atol($1->c_str()) ); delete $1;
+#endif
+}
+
+;
+
+const_int:
+	  CONST_INT		{
 #if TEST_MODE > TEST_PARSER
 $$ = new NInteger( atoi($1->c_str() ) ); delete $1;
 #endif
@@ -869,7 +895,7 @@ $$ = new NArrayExpr(*$1, *$3);
 */
 %%
 
-#if TEST_MODE < TEST_NONE
+#if TEST_MODE < TEST_NONE && TEST_MODE > TEST_SCANNER
 
 #include<cctype>
 #include<cstring>

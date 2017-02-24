@@ -116,6 +116,7 @@ union YYSTYPE
 #if TEST_MODE > TEST_PARSER
 	Node *node;
 	NExpression *expr;
+	NConst *const_int_val;
 	NInteger *const_int;
 	NConst *const_val;
 	NIdentifier *ident;
@@ -138,6 +139,10 @@ union YYSTYPE
 	CaseList *caze_l;
 	NSwitch *swtch;
 	NIf *iff;
+	NForRangeOperand *forr_it_op;
+	NForIterator *forr_it;
+	NFor *forr;
+	NWhile *whilee;
 	VariableList *var_l;
 	NFunctionDecl *funcd;
 	DeclarationList *dec_l;
@@ -179,7 +184,7 @@ union YYSTYPE
 	std::string *str;
 	int token;
 
-#line 183 "parser.hpp" /* yacc.c:1909  */
+#line 188 "parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

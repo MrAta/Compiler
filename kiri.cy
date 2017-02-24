@@ -44,3 +44,53 @@ exit:
 	# exit does not have any return value, finishing this line will terminate the program like return 0 in C's main function
 	return 
 
+# also main is the name of the function
+main:
+	# As main is the start function, execution starts from this point
+
+	# Testing reading and writing from standard input, output
+	X[int] = 10
+	write(X)
+	X = 12
+	write(X)
+	read(X)
+	write(X)
+
+	# an array
+	Y[int<100>]
+
+
+
+	# simple if statement
+	@ grammar does not support this now, to fix this suppose that grammar is like:
+		<EXPR> ::= id['['<EXPR>']'] @
+	if (Y[0] + Y[1]) > 12 :
+		z = x + write("if condition is true\n")
+	elif (Y[0] + Y[1]) > 6 :
+		write("if other condition is true\n")
+	elif (Y[0] + Y[1]) > 3 :
+		write("if other condition is true\n")
+	else:
+		write("if condition if false\n")
+
+	Ch[char] 
+	read(Ch)
+
+	# case statement, notice indents
+	case Ch:
+		'a':
+			write("given character is \'a\'\n")
+		'b':
+			write("given character is \'b\'\n")
+		default: 
+			write("given character is not \'a\'\n")
+
+	# simple function call
+	Q = func(X, Ch, 12.3)
+	# Cython's function calls are call by value, so X must save its value 
+	write(X)
+	write(Q[0])
+	write(Q[1])
+
+	# main does not have any return value, when code reaches this line, finish function must be called
+	return		
