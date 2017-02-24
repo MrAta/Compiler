@@ -35,7 +35,11 @@ class NVarDecl;
 class TsDecl;
 class NAssignment;
 class AssignmentLHS;
+class NCase;
+class NSwitch;
+class NIf;
 class NBlock;
+class NFunctionDecl;
 class NProgram;
 typedef std::vector<NIdentifier*> IdentifierList;
 typedef std::vector<NExpression*> ExpressionList;
@@ -43,6 +47,7 @@ typedef std::vector<NStatement*> StatementList;
 typedef std::vector<TsDecl*> TsDeclList;
 typedef std::vector<NVarDecl*> VariableList;
 typedef std::vector<NDecl*> DeclarationList;
+typedef std::vector<NCase*> CaseList;
 
 extern NProgram    *programBlock;
 extern NIdentifier *start;
@@ -56,6 +61,7 @@ class NBool;
 class NString;
 class NBreak;
 class NContinue;
+class NConditional;
 
 /* Class Declarations */
 
@@ -68,16 +74,19 @@ public:
 
 class NExpression : public Node {
 public:
+	CODEGEN_FUNC();
 	virtual void print() {}
 };
 
 class NStatement : public Node {
 public:
+	CODEGEN_FUNC();
 	virtual void print() {}
 };
 
 class NConst   : public NExpression {
 public:
+	CODEGEN_FUNC();
 	virtual void print() {}
 };
 
@@ -87,11 +96,18 @@ public:
 	virtual void print() {}
 };
 
-class AssignmentLHS : public Node{
+class AssignmentLHS : public Node {
 public:
 	CODEGEN_FUNC();
 	virtual void print() {}
 };
+
+class NConditional : public NStatement {
+public:
+	CODEGEN_FUNC();
+	virtual void print() {}
+};
+
 
 class NInteger : public NConst {
 public:
@@ -319,6 +335,8 @@ public:
 	StatementList statements;
 	NBlock(StatementList& statements) :
 		statements(statements) { TEST_PRINT(); TEST_PRINT_ME(5); }
+	NBlock(NStatement& statement) : NBlock(*(new StatementList(1, &statement))) {} 
+	NBlock() : NBlock(*(new StatementList())) {}
 	CODEGEN_FUNC();
 	void print(){
 		StatementList::reverse_iterator rit;
@@ -331,6 +349,55 @@ public:
 	}
 };
 
+class NCaseDefault : public Node {
+public:
+	NBlock& block;
+	NCaseDefault(NBlock& block) :
+		block(block) { TEST_PRINT(); TEST_PRINT_ME(6); }
+	CODEGEN_FUNC();
+	void print(){
+		TEST_PRINT_LEAF("Default:");
+		TEST_PRINT_MEM(block);
+		TEST_PRINT_LEAF(std::endl);
+	}
+};
+
+class NCase : public Node {
+public:
+	NInteger& condition;
+	NBlock& block;
+	NCase(NInteger& condition, NBlock& block) :
+		condition(condition), block(block) { TEST_PRINT(); TEST_PRINT_ME(6); }
+	CODEGEN_FUNC();
+	void print(){
+		TEST_PRINT_LEAF("Case:");
+		TEST_PRINT_MEM(condition);
+		TEST_PRINT_LEAF(std::endl);
+		TEST_PRINT_MEM(block);
+		TEST_PRINT_LEAF(std::endl);
+	}
+};
+
+class NSwitch : public NConditional {
+public:
+	NExpression& expression;
+	CaseList cases;
+	NCaseDefault* default_case;
+	NSwitch(NExpression& expression, CaseList cases, NCaseDefault* default_case) :
+		expression(expression), cases(cases), default_case(default_case) { TEST_PRINT(); TEST_PRINT_ME(7); }
+	CODEGEN_FUNC();
+	void print(){}
+};
+
+class NIf : public NConditional {
+public:
+	NExpression& expression;
+	NBlock& if_block;
+	NBlock& else_block;
+	NIf(NExpression& expression, NBlock& if_block, NBlock& else_block) :
+		expression(expression), if_block(if_block), else_block(else_block) { TEST_PRINT(); TEST_PRINT_ME(7); }
+};
+
 class NFunctionDecl : public NDecl {
 public:
 	TsDeclList& returns;
@@ -338,7 +405,7 @@ public:
 	VariableList& arguments;
 	NBlock& block;
 	NFunctionDecl(TsDeclList& returns, NIdentifier& id, VariableList& arguments, NBlock& block) :
-		returns(returns), id(id), arguments(arguments), block(block) { TEST_PRINT(); TEST_PRINT_ME(6); }
+		returns(returns), id(id), arguments(arguments), block(block) { TEST_PRINT(); TEST_PRINT_ME(8); }
 	CODEGEN_FUNC();
 	void print(){
 		VariableList::reverse_iterator rit;
@@ -356,7 +423,6 @@ public:
 			TEST_PRINT_LEAF(",");
 		} TEST_PRINT_LEAF(std::endl);
 	}
-	
 };
 
 class NProgram : public Node {
@@ -365,7 +431,7 @@ public:
 	NIdentifier& start;
 	NIdentifier& finish;
 	NProgram(DeclarationList& declarations, NIdentifier& start, NIdentifier& finish) :
-		declarations(declarations), start(start), finish(finish) { TEST_PRINT(); TEST_PRINT_ME(7); }
+		declarations(declarations), start(start), finish(finish) { TEST_PRINT(); TEST_PRINT_ME(9); }
 	CODEGEN_FUNC();
 	void print(){
 		DeclarationList::reverse_iterator rit;

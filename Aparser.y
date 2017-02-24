@@ -70,6 +70,11 @@ long lval;
 	NArrayExpr *arr;
 	StatementList *stmt_l;
 	NBlock *blk;
+	NCaseDefault *caze_default;
+	NCase *caze;
+	CaseList *caze_l;
+	NSwitch *swtch;
+	NIf *iff;
 	VariableList *var_l;
 	NFunctionDecl *funcd;
 	DeclarationList *dec_l;
@@ -144,9 +149,10 @@ long lval;
 %type <blk> block
 %type <stmt_l> block1
 %type <ret> return_stmt
-%type <token> cond_stmt
-%type <token> cond_stmt1
-%type <token> cond_stmt2
+%type <swtch> case_stmt
+%type <caze_l> case_stmt1
+%type <iff> if_stmt
+%type <blk> if_stmt1
 %type <token> loop_stmt 
 %type <token> loop_stmt1
 %type <token> loop_stmt2
@@ -379,7 +385,16 @@ $$=$1;
 $$=$1;
 #endif
 }
-	| cond_stmt
+	| if_stmt						{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
+	| case_stmt						{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}						
 	| loop_stmt
 	| return_stmt						{
 #if TEST_MODE > TEST_PARSER
@@ -491,57 +506,62 @@ $3->push_back($2); $$ = $3;
 }
 ;
 
-cond_stmt : 
-	  IF expr COLON INDENT block UNINDENT cond_stmt1	{
-#if 0 && TEST_MODE > TEST_PARSER
-//$7->ebl.emplace_back($2, $5); $$ = $7;
-$7->ebl.push_back(new ExprBlock($2, $5)); $$ = $7;
-#endif
-}
-	| IF expr COLON INDENT block UNINDENT cond_stmt1 ELSE COLON INDENT block UNINDENT
-								{
-#if 0 && TEST_MODE > TEST_PARSER
-//$7->ebl.emplace_back($2, $5);
-//$7->ebl.emplace_back(new NBool(true), $11); $$ = $7;
-$7->ebl.push_back(new ExprBlock($2, $5)); $7->ebl.push_back(new ExprBlock(new NBool(true), $11)); $$ = $7;
-//$7->bl.push_back($5); $7->bl.push_back($11); $7->el.push_back($2); $$ = $7;
-#endif
-}
-	| CASE expr COLON INDENT cond_stmt2 UNINDENT		{
-#if 0 && TEST_MODE > TEST_PARSER
-$5->Expression = $2; $$ = $5;
-#endif
-}
-	| CASE expr COLON INDENT cond_stmt2 DEFAULT COLON INDENT block	UNINDENT UNINDENT
-								{
-#if 0 && TEST_MODE > TEST_PARSER
-$5->ebl.push_back(new ExprBlock(new NBool(true), $9)); $5->Expression = $2; $$ = $5;
-//$5->ebl.emplace_back(new NBool(true), $9); $5->Expression = $2; $$ = $5;
-#endif
-}
-;
-cond_stmt1 : 							{
-#if 0 && TEST_MODE > TEST_PARSER
-$$ = new NIf();
-#endif
-}	//NIf() has two list: Block and Expression List. if we have 'else' then bl.length -1 = el.length . if we do not have 'else' then bl.length = el.length .
-	| ELIF expr COLON INDENT block UNINDENT cond_stmt1	{
-#if 0 && TEST_MODE > TEST_PARSER
-//$7->ebl.emplace_back($2, $5); $$ = $7;
-$7->ebl.push_back(new ExprBlock($2, $5)); $$ = $7;
-//$7->bl.push_back($5); $7->el.push_back($2); $$ = $7;
+if_stmt : 
+	  IF expr COLON INDENT block UNINDENT if_stmt1		{
+#if TEST_MODE > TEST_PARSER
+$$ = new NIf(*$2, *$5, *$7);
 #endif
 }
 ;
 
-cond_stmt2 : 							{
-#if 0 && TEST_MODE > TEST_PARSER
-$$ = new NCase();
+if_stmt1 :
+								{
+#if TEST_MODE > TEST_PARSER
+$$ = new NBlock();
 #endif
 }
-	| const_val COLON INDENT block UNINDENT cond_stmt2	{
-#if 0 && TEST_MODE > TEST_PARSER
-$6->ebl.push_back(new ExprBlock($1, $4)); $$ = $6;
+	| ELSE COLON INDENT block UNINDENT			{
+#if TEST_MODE > TEST_PARSER
+$$ = $4;
+#endif
+}
+	| ELIF expr COLON INDENT block UNINDENT if_stmt1	{
+#if TEST_MODE > TEST_PARSER
+/*
+StatementList& sl = *(new StatementList());
+sl.push_back(new NIf(*$2, *$5, *$7));
+$$ = new NBlock(sl);
+*/
+$$ = new NBlock(*(new NIf(*$2, *$5, *$7)));
+#endif
+}
+;
+
+case_stmt : 
+	CASE expr COLON INDENT case_stmt1 UNINDENT		{
+#if TEST_MODE > TEST_PARSER
+//$5->Expression = $2; $$ = $5;
+$$ = new NSwitch(*$2, *$5, NULL);
+#endif
+}
+	| CASE expr COLON INDENT case_stmt1 DEFAULT COLON INDENT block	UNINDENT UNINDENT
+								{
+#if TEST_MODE > TEST_PARSER
+$$ = new NSwitch(*$2, *$5, new NCaseDefault(*$9));
+//$5->ebl.push_back(new ExprBlock(new NBool(true), $9)); $5->Expression = $2; $$ = $5;
+//$5->ebl.emplace_back(new NBool(true), $9); $5->Expression = $2; $$ = $5;
+#endif
+}
+;
+
+case_stmt1 : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new CaseList();
+#endif
+}
+	| const_int COLON INDENT block UNINDENT case_stmt1	{
+#if TEST_MODE > TEST_PARSER
+$6->push_back(new NCase(*$1, *$4)); $$ = $6;
 //$6->ebl.emplace_back($1, $4); $$ = $6;
 #endif
 }
@@ -560,6 +580,7 @@ $$ = new NWhile(*$2, *$5);
 #endif
 }		//new NWhile(NExpression condition, NBlock block);
 ;
+
 loop_stmt1 :							{
 #if 0 && TEST_MODE > TEST_PARSER
 $$ = new NFor(NULL, NULL, 1);

@@ -133,6 +133,11 @@ union YYSTYPE
 	NArrayExpr *arr;
 	StatementList *stmt_l;
 	NBlock *blk;
+	NCaseDefault *caze_default;
+	NCase *caze;
+	CaseList *caze_l;
+	NSwitch *swtch;
+	NIf *iff;
 	VariableList *var_l;
 	NFunctionDecl *funcd;
 	DeclarationList *dec_l;
@@ -174,7 +179,7 @@ union YYSTYPE
 	std::string *str;
 	int token;
 
-#line 178 "parser.hpp" /* yacc.c:1909  */
+#line 183 "parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
