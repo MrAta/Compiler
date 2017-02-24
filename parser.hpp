@@ -111,7 +111,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 54 "Aparser.y" /* yacc.c:1909  */
+#line 52 "Aparser.y" /* yacc.c:1909  */
 
 #if TEST_MODE > TEST_PARSER
 	Node *node;
@@ -124,6 +124,19 @@ union YYSTYPE
 	NReturn *ret;
 	ExpressionList *expr_l;
 	NFuncCall *func;
+	NStatement *stmt;
+	NVarDecl *vard;
+	TsDecl *tsd;
+	TsDeclList *tsd_l;
+	NAssignment *ass;
+	AssignmentLHS *lhs;
+	NArrayExpr *arr;
+	StatementList *stmt_l;
+	NBlock *blk;
+	VariableList *var_l;
+	NFunctionDecl *funcd;
+	DeclarationList *dec_l;
+	NProgram *prog;
 /*
 	NBlock *block;
 	NStatement *stmt;
@@ -161,7 +174,7 @@ union YYSTYPE
 	std::string *str;
 	int token;
 
-#line 165 "parser.hpp" /* yacc.c:1909  */
+#line 178 "parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

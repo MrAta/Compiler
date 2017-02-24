@@ -18,12 +18,10 @@
 #include <cstdbool>
 #define YYDEBUG 1
 
-#if 0
-//#if TEST_MODE > TEST_PARSER
-NBlock *programBlock; /* the top level root node of our final AST */
-NIdentifier* start = NULL;
-NIdentifier* finish = NULL;
-//#endif
+#if TEST_MODE > TEST_PARSER
+NProgram    *programBlock; /* the top level root node of our final AST */
+NIdentifier *start;
+NIdentifier *finish;
 #endif
 
  /*NProgram *program; /* the top level root node of our final AST */
@@ -63,6 +61,19 @@ long lval;
 	NReturn *ret;
 	ExpressionList *expr_l;
 	NFuncCall *func;
+	NStatement *stmt;
+	NVarDecl *vard;
+	TsDecl *tsd;
+	TsDeclList *tsd_l;
+	NAssignment *ass;
+	AssignmentLHS *lhs;
+	NArrayExpr *arr;
+	StatementList *stmt_l;
+	NBlock *blk;
+	VariableList *var_l;
+	NFunctionDecl *funcd;
+	DeclarationList *dec_l;
+	NProgram *prog;
 /*
 	NBlock *block;
 	NStatement *stmt;
@@ -122,14 +133,16 @@ long lval;
 %token <token> START FINISH
 */
 
-%type <token> program
-%type <token> start finish
-%type <token> var_dcl
-%type <token> ts_dcl 
-%type <token> ts_dcl1
-%type <token> func_dcl 
-%type <token> func_dcl1
-%type <token> block //block_0
+%type <prog> program
+%type <dec_l> program1
+%type <ident> start finish
+%type <vard> var_dcl
+%type <tsd_l> ts_dcl 
+%type <tsd_l> ts_dcl1
+%type <funcd> func_dcl 
+%type <var_l> func_dcl1
+%type <blk> block
+%type <stmt_l> block1
 %type <ret> return_stmt
 %type <token> cond_stmt
 %type <token> cond_stmt1
@@ -138,18 +151,20 @@ long lval;
 %type <token> loop_stmt1
 %type <token> loop_stmt2
 %type <expr> expr
+%type <expr_l> expr1
 %type <ident_l> id1
-%type <token> expr1
-%type <token> statement
-%type <token> assignment
+%type <stmt> statement
+%type <ass> assignment
+%type <lhs> assignment_lhs
 %type <func> func_call
 %type <expr_l> func_param1
 %type <expr_l> func_param //func_param2
 %type <bin_op> bin_op
 %type <const_val> const_val 
 %type <const_int> const_int
-%type <token> type
 %type <ident> id
+%type <arr> array
+%type <token> type
 /*
 %type type
 %type const_int
@@ -179,35 +194,58 @@ long lval;
 %start program
 
 %%
+program :
+	program1						{
+#if TEST_MODE > TEST_PARSER
+$$ = programBlock = new NProgram(*$1);
+#endif
+}
+;
 
-program : 							{
-#if 0 && TEST_MODE > TEST_PARSER
-$$ = new NBlock(); programBlock = $$;
+program1 : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new DeclarationList();
 #endif
 }
-	| var_dcl program					{
-#if 0 && TEST_MODE > TEST_PARSER
-if( $1 != NULL) $2->statements.push_back($1); $$ = $2;
+	| var_dcl program1					{
+#if TEST_MODE > TEST_PARSER
+if( $1 != NULL) {
+	$2->push_back($1);
+	$$ = $2;
+} else {
+	yyerror("Ridi!");
+}
 #endif
 }
-	| func_dcl program					{
-#if 0 && TEST_MODE > TEST_PARSER
-if( $1 != NULL) $2->statements.push_back($1); $$ = $2;
+	| func_dcl program1					{
+#if TEST_MODE > TEST_PARSER
+if( $1 != NULL) {
+	$2->push_back($1);
+	$$ = $2;
+} else {
+	yyerror("Rede!");
+}
 #endif
 }
 
-	| start program						{
-#if 0 && TEST_MODE > TEST_PARSER
-if( start == NULL ) start = $1; 
-else yyerror("multiple definition of start");
-$$ = NULL;
+	| start program1					{
+#if TEST_MODE > TEST_PARSER
+if( start == NULL )
+	start = $1; 
+else
+	yyerror("multiple definition of start");
+
+$$ = $2;
 #endif
 }
-	| finish program					{
-#if 0 && TEST_MODE > TEST_PARSER
-if( finish == NULL ) finish = $1;
-else yyerror("multiple definition of finish");
-$$ = NULL;
+	| finish program1					{
+#if TEST_MODE > TEST_PARSER
+if( finish == NULL )
+	finish = $1;
+else
+	yyerror("multiple definition of finish");
+
+$$ = $2;
 #endif
 }
 
@@ -215,14 +253,14 @@ $$ = NULL;
 
 start : 
 	  START id						{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = $2;
 #endif
 }
 ;
 finish : 
 	  FINISH id						{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = $2;
 #endif
 }
@@ -230,7 +268,7 @@ $$ = $2;
 
 var_dcl : 
 	  id ts_dcl						{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = new NVarDecl(*$1, *$2);
 #endif
 }
@@ -238,32 +276,32 @@ $$ = new NVarDecl(*$1, *$2);
 
 ts_dcl : 
 	LBRACK type ts_dcl1 RBRACK				{ 
-#if 0 && TEST_MODE > TEST_PARSER 
+#if TEST_MODE > TEST_PARSER 
 //$3->emplace_back(new TsDecl($2, new NInteger(1))); 
 //$$ = $3;
 $3->push_back(new TsDecl($2, 1)); $$ = $3; 
 #endif
 }
 	| LBRACK type LT const_int GT ts_dcl1 RBRACK		{ 
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 //$6->emplace_back($2, *$4); $$ = $6;
 $6->push_back(new TsDecl($2, $4->value)); $$ = $6; 
 #endif
 }
 ;
 ts_dcl1 : 							{ 
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = new TsDeclList(); 
 #endif
 }
 	| COMMA type LT const_int GT ts_dcl1			{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 //$6->emplace_back($2, *$4); $$ = $6;
 $6->push_back(new TsDecl($2, $4->value)); $$ = $6; 
 #endif
 }
 	| COMMA type ts_dcl1					{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 //$3->emplace_back($2, new NInteger(1)); $$ = $3;
 $3->push_back(new TsDecl($2, 1)); $$ = $3; 
 #endif
@@ -272,102 +310,127 @@ $3->push_back(new TsDecl($2, 1)); $$ = $3;
 
 func_dcl : 
 	  id COLON INDENT block UNINDENT				{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = new NFunctionDecl(*(new TsDeclList()), *$1, *(new VariableList()), *$4);
 #endif
 }
 	| ts_dcl id var_dcl func_dcl1 COLON INDENT block UNINDENT 	{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $4->push_back($3); $$ = new NFunctionDecl(*$1, *$2, *$4, *$7);
 #endif
 }
 	| ts_dcl id COLON INDENT block UNINDENT				{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = new NFunctionDecl(*$1, *$2, *(new VariableList()), *$5);
 #endif
 }
 	| id var_dcl func_dcl1 COLON INDENT block UNINDENT		{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $3->push_back($2); $$ = new NFunctionDecl(*(new TsDeclList()), *$1, *$3, *$6);
 #endif
 }
 ;
 
 func_dcl1 : 							{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = new VariableList();
 #endif
 }
 	| COMMA var_dcl func_dcl1				{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = $3; $$->push_back($2);
 #endif
 }
 ;
 
-block : 							{
-#if 0 && TEST_MODE > TEST_PARSER
-$$ = new NBlock();
+block :
+	block1							{
+#if TEST_MODE > TEST_PARSER
+$$ = new NBlock(*$1);
 #endif
 }
-	| var_dcl block						{
-#if 0 && TEST_MODE > TEST_PARSER
-$2->statements.push_back($1); $$ = $2;
+;
+
+block1 : 							{
+#if TEST_MODE > TEST_PARSER
+$$ = new StatementList();
 #endif
 }
-	| statement block					{
-#if 0 && TEST_MODE > TEST_PARSER
-$2->statements.push_back($1); $$ = $2;
+	| statement block1					{
+#if TEST_MODE > TEST_PARSER
+$2->push_back($1); $$ = $2;
 #endif
 }
 ;
 
 statement : 
-	  assignment
+	  assignment						{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
+	| var_dcl						{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
 	| func_call						{
-#if 0
-$<stmt>$ = $1;
+#if TEST_MODE > TEST_PARSER
+$$=$1;
 #endif
 }
 	| cond_stmt
 	| loop_stmt
-	| return_stmt						{ $$ = 0; }
+	| return_stmt						{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
 	| BREAK							{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = new NBreak();
 #endif
 }
 	| CONTINUE						{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = new NContinue();
 #endif
 }
 ;
 
 assignment : 
-	  id EQ expr expr1					{
-#if 0 && TEST_MODE > TEST_PARSER
-$4->push_back($3); $$ = new NAssignment($1, *$4);
-#endif
-}
-	| id LBRACK expr expr1 RBRACK EQ expr expr1		{
-#if 0 && TEST_MODE > TEST_PARSER
-$4->push_back($3); $8->push_back($7); $$ = new NAssignment($1, $4, *$8);
-#endif
-}
-	| var_dcl EQ expr expr1					{
-#if 0 && TEST_MODE > TEST_PARSER
-$4->push_back($3); $$ = new NAssignment($1, *$4);
+	  assignment_lhs EQ expr expr1				{
+#if TEST_MODE > TEST_PARSER
+$4->push_back($3); $$ = new NAssignment(*$1, *$4);
 #endif
 }
 ;
+
+assignment_lhs:
+	  id							{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
+	| array							{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
+	| var_dcl						{
+#if TEST_MODE > TEST_PARSER
+$$=$1;
+#endif
+}
+;
+
 expr1 : 							{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $$ = new ExpressionList();
 #endif
 }
 	| COMMA expr expr1					{
-#if 0 && TEST_MODE > TEST_PARSER
+#if TEST_MODE > TEST_PARSER
 $3->push_back($2); $$ = $3;
 #endif
 }
@@ -598,9 +661,9 @@ $$ = $1;
 //$$ = new NExpression(*$1);
 #endif
 }
-	| id LBRACK expr RBRACK {
+	| array			{
 #if TEST_MODE > TEST_PARSER
-$$ = new NArrayExpr(*$1, *$3);
+$$=$1;
 #endif
 }
 	| const_val		{
@@ -761,7 +824,28 @@ $$ = new NIdentifier (*$1); delete $1;
 #endif
 }
 ;
+//TODO What the fuck should I finally do? how many dimensions etc. ?
+array : id LBRACK expr expr1 RBRACK {
+#if TEST_MODE > TEST_PARSER
+$$ = new NArrayExpr(*$1, *$3);
+#endif
+}
+;
+/*
+array_lhs : id LBRACK expr expr1 RBRACK {
+#if TEST_MODE > TEST_PARSER
+$$ = new NArrayExpr(*$1, *$3);
+#endif
+}
+;
 
+array_expr : id LBRACK expr RBRACK {
+#if TEST_MODE > TEST_PARSER
+$$ = new NArrayExpr(*$1, *$3);
+#endif
+}
+;
+*/
 %%
 
 #if TEST_MODE < TEST_NONE

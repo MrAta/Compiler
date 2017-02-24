@@ -9,4 +9,4 @@
 
 #define TEST_MODE	TEST_AST
 
-#define AST_DEBUG_LEVEL 2
+#define AST_DEBUG_LEVEL 7
