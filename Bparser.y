@@ -58,11 +58,6 @@ long lval;
 	NInteger *const_int;
 	NConst *const_val;
 	NIdentifier *ident;
-	NBinaryOp *bin_op;
-	IdentifierList *ident_l;
-	NReturn *ret;
-	ExpressionList *expr_l;
-	NFuncCall *func;
 /*
 	NBlock *block;
 	NStatement *stmt;
@@ -130,7 +125,7 @@ long lval;
 %type <token> func_dcl 
 %type <token> func_dcl1
 %type <token> block //block_0
-%type <ret> return_stmt
+%type <token> return_stmt
 %type <token> cond_stmt
 %type <token> cond_stmt1
 %type <token> cond_stmt2
@@ -138,14 +133,16 @@ long lval;
 %type <token> loop_stmt1
 %type <token> loop_stmt2
 %type <expr> expr
-%type <ident_l> id1
+%type <token> id1
 %type <token> expr1
 %type <token> statement
 %type <token> assignment
-%type <func> func_call
-%type <expr_l> func_param1
-%type <expr_l> func_param //func_param2
-%type <bin_op> bin_op
+%type <token> func_call
+%type <expr> func_param1
+%type <token> func_param func_param2
+%type <token> bin_op
+%type <token> arithmetic
+%type <token> conditional
 %type <const_val> const_val 
 %type <const_int> const_int
 %type <token> type
@@ -157,24 +154,19 @@ long lval;
 %right EQ
 
 %right COMMA
-/*
-%nonassoc LBRACK RBRACK
-*/
+
 %left ANDAND OROR
 
 %left EQEQ NOTEQ
 %left LT LTEQ GT GTEQ
 
-%left PLUS MINUS
 %left MULT DIV MOD
+%left PLUS MINUS
 %left OR AND XOR
 %right SIZEOF NEG COMP NOT
 
 %left RPAREN
 %right LPAREN
-
-%right RETURN
-%right ID
 
 %start program
 
@@ -331,7 +323,7 @@ $<stmt>$ = $1;
 }
 	| cond_stmt
 	| loop_stmt
-	| return_stmt						{ $$ = 0; }
+	| return_stmt
 	| BREAK							{
 #if 0 && TEST_MODE > TEST_PARSER
 $$ = new NBreak();
@@ -375,7 +367,7 @@ $3->push_back($2); $$ = $3;
 
 func_call : 
 	  id func_param						{
-#if TEST_MODE > TEST_PARSER
+#if 0 && TEST_MODE > TEST_PARSER
 $$ = new NFuncCall(*$1, *$2);
 #endif
 }
@@ -394,35 +386,28 @@ sizeof1 : 							{ $$ = new NSizeOf(); }
 ;
 
 func_param : 
-	   LPAREN RPAREN					{
-#if TEST_MODE > TEST_PARSER
-$$ = new ExpressionList();
-#endif
-}
-	   | LPAREN expr func_param1 RPAREN			{
-#if TEST_MODE > TEST_PARSER
+	   LPAREN func_param1 func_param2 RPAREN		{
+#if 0 && TEST_MODE > TEST_PARSER
 $3->push_back($2); $$ = $3;
 #endif
 }
 ;
-/*
 func_param1 :							{
 #if 0 && TEST_MODE > TEST_PARSER
 $$ = new NBlank();
 #endif
 }
 	| expr	
-	//| id
-	//| const_val
+	/*| id	*/
+	/*| const_val	*/
 ;
-*/
-func_param1 :							{
-#if TEST_MODE > TEST_PARSER
+func_param2 :							{
+#if 0 && TEST_MODE > TEST_PARSER
 $$ = new ExpressionList();
 #endif
 }
-	| COMMA expr func_param1				{
-#if TEST_MODE > TEST_PARSER
+	| COMMA func_param1 func_param2				{
+#if 0 && TEST_MODE > TEST_PARSER
 $3->push_back($2); $$ = $3;
 #endif
 }
@@ -553,24 +538,24 @@ $$ = new NBlock();
 
 return_stmt :
 	  RETURN  						{
-#if TEST_MODE > TEST_PARSER
+#if 0 && TEST_MODE > TEST_PARSER
 $$ = new NReturn( *(new IdentifierList()) );
 #endif
 }
 	| RETURN id id1 					{
-#if TEST_MODE > TEST_PARSER
+#if 0 && TEST_MODE > TEST_PARSER
 $3->push_back($2); $$ = new NReturn(*$3);
 #endif
 }
 ;
 
 id1 :								{
-#if TEST_MODE > TEST_PARSER
+#if 0 && TEST_MODE > TEST_PARSER
 $$ = new IdentifierList();
 #endif
 }
 	| COMMA id id1						{
-#if TEST_MODE > TEST_PARSER
+#if 0 && TEST_MODE > TEST_PARSER
 $3->push_back($2); $$ = $3;
 #endif
 }
@@ -582,9 +567,9 @@ expr :
 $$ = $2;
 #endif
 }
-	| bin_op		{
+	| expr bin_op expr	{
 #if TEST_MODE > TEST_PARSER
-//$$ = new NBinaryOp(*$1, $2, *$3);
+$$ = new NBinaryOp(*$1, $2, *$3);
 #endif
 }
 	| func_call		{
@@ -594,12 +579,11 @@ $$ = $2;
 }
 	| id			{
 #if TEST_MODE > TEST_PARSER
-$$ = $1;
 //$$ = new NExpression(*$1);
 #endif
 }
 	| id LBRACK expr RBRACK {
-#if TEST_MODE > TEST_PARSER
+#if 0 && TEST_MODE > TEST_PARSER
 $$ = new NArrayExpr(*$1, *$3);
 #endif
 }
@@ -625,86 +609,14 @@ $$ = new NUnaryOp($1, *$2);
 }
 ;
 bin_op :
-	  expr PLUS   expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr MINUS  expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr MULT   expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr DIV    expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr MOD    expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr AND    expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr OR     expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr XOR    expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr OROR   expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr ANDAND expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr EQEQ   expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr NOTEQ  expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr GTEQ   expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr LTEQ   expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr LT     expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
-	| expr GT     expr {
-#if TEST_MODE > TEST_PARSER
-$$ = new NBinaryOp(*$1, $2, *$3);
-#endif
-}
+	  arithmetic
+	| conditional
+;
+
+arithmetic :  PLUS | MINUS | MULT | DIV | MOD | AND | OR | XOR | OROR | ANDAND
+;
+
+conditional : EQEQ | NOTEQ | GTEQ | LTEQ | LT | GT
 ;
 
 const_val : 
