@@ -29,15 +29,19 @@ public:
 };
 
 class CodeGenContext {
-    std::stack<CodeGenBlock *> blocks;
-    Function *startFunction;
+	std::stack<CodeGenBlock *> blocks;
+	Function *startFunction;
 	Function *finsishFunction;
 
 public:
     Module *module;
-    CodeGenContext() { module = new Module("main", getGlobalContext()); }
+    CodeGenContext() { 
+	module = new Module("start", getGlobalContext());
+	startFunction = NULL;
+	finishFunction = NULL;
+}
     
-    void generateCode(NBlock& root);
+    void generateCode(NProgram& root);
     GenericValue runCode();
     std::map<std::string, Value*>& locals() { return blocks.top()->locals; }
     BasicBlock *currentBlock() { return blocks.top()->block; }
