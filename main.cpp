@@ -16,15 +16,15 @@ int main(int argc, char **argv)
 	yyparse();
 	cout << programBlock << endl;
     // see http://comments.gmane.org/gmane.comp.compilers.llvm.devel/33877
-/*	InitializeNativeTarget();
+	InitializeNativeTarget();
 	InitializeNativeTargetAsmPrinter();
 	InitializeNativeTargetAsmParser();
 	CodeGenContext context;
 	createCoreFunctions(context);
 	context.generateCode(*programBlock);
 	context.runCode();
-*/
-	programBlock->codeGen();	
+
+//	programBlock->codeGen();	
 	return 0;
 }
 

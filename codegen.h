@@ -32,7 +32,8 @@ class CodeGenContext {
 	std::stack<CodeGenBlock *> blocks;
 	Function *startFunction;
 	Function *finsishFunction;
-
+	IRBuilder<> builder(context); 
+	
 public:
     Module *module;
     CodeGenContext() { 

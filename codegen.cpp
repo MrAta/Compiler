@@ -10,35 +10,48 @@ void CodeGenContext::generateCode(NProgram& root)
 {
 	std::cout << "Generating code...\n";
 	
-	/* Create the top level interpreter function to call as entry */
-/*	vector<Type*> argTypes;
-	FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), makeArrayRef(argTypes), false);
-	root.startFunction.name = Function::Create(ftype, GlobalValue::InternalLinkage, "main", module);
-	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", root.startFunction.name, 0);
-*/
-	Function *start;
-	BasicBlock *startblock;
-	Function *finish;
-	BasicBlock *finishblock;
-	start = context.module->getFunction(root.start.c_str());
-	if (root.finish == NULL) {
-		std::cout << "no finish function " << endl;
+#if 0	//DeclarationList& declarations;
+	DeclarationList::const_iterator it;
+	NFunctionDecl* start;
+	for (it = root.declarations.begin(); it != root.declarations.end(); it++) {
+		std::cout << "Finding start function" << endl;
+		if(NFunctionDecl* f = dynamic_cast<NFunctionDecl*>(**it)){
+			if(root.start.name.compare(f.id.name) != 0) {
+				start = f;
+				break;
+			}
+		}
 	}
-	else{
-		finish = context.module->getFunction(root.finish.c_str());
-		finishblock = BasicBlock::Create(getGlobalContext(), "entry", finish, 0);
-	}
-	startblock = BasicBlock::Create(getGlobalContext(), "entry", start, 0);
-	/* Push a new variable/block context */
-	pushBlock(startblock);
-	root.codeGen(*this); /* emit bytecode for the toplevel block */
-	ReturnInst::Create(getGlobalContext(), startblock);
-	popBlock();
+	std::cout << "Generating code...\n";
 	
+	/* Create the top level interpreter function to call as entry */
+	vector<Type*> argTypes;
+	FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), makeArrayRef(argTypes), false);
+	mainFunction = Function::Create(ftype, GlobalValue::InternalLinkage, "start", module);
+	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", mainFunction, 0);
+
+	/* Push a new variable/block context */
+	pushBlock(bblock);
+
+	root.codeGen(*this); /* emit bytecode for the toplevel block */
+	ReturnInst::Create(getGlobalContext(), bblock);
+	popBlock();
+#endif
+	root.codeGen(*this);
 	/* Print the bytecode in a human-readable format 
 	   to see if our program compiled properly
 	 */
+	startFunction = context.module->getFunction(root.start.name.c_str());
+	if(startFunction == NULL){
+		std::cerr << "no start function" << endl;
+		exit(0);
+	}
+	if(finishFunction != NULL) 
+		finishFunction = context.module->getFunction(root.finish.name.c_str());
 	std::cout << "Code is generated.\n";
+	/* Print the bytecode in a human-readable format 
+	   to see if our program compiled properly
+	 */
 	PassManager<Module> pm;
 	pm.addPass(PrintModulePass(outs()));
 	pm.run(*module);
@@ -51,7 +64,7 @@ GenericValue CodeGenContext::runCode() {
 	ee->finalizeObject();
 	vector<GenericValue> noargs;
 	GenericValue v = ee->runFunction(startFunction, noargs);
-	GenericValue v = ee->runFunction(finishFunction, noargs);
+if(finishFunction != NULL) enericValue v = ee->runFunction(finishFunction, noargs);
 	std::cout << "Code was run.\n";
 	return v;
 }
@@ -174,23 +187,23 @@ Value* NBinaryOp::codeGen(CodeGenContext& context)
 	Value *L = lhs->codegen();
 	Value *R = rhs->codegen();
 	switch (op) {
-		case PLUS: 		    return Builder.CreateFAdd(L, R, "addtmp");
-		case MINUS: 		return Builder.CreateFSub(L, R, "subtmp");
-		case MUL: 		    return Builder.CreateFMul(L, R, "multmp");
-		case DIV: 			return Builder.CreateFDiv(L, R, "divtmp");
-		case MOD:			return Builder.CreateSRem(L, R, "remtmp");
+		case PLUS: 		    return context.builder.CreateFAdd(L, R, "addtmp");
+		case MINUS: 		return context.builder.CreateFSub(L, R, "subtmp");
+		case MUL: 		    return context.builder.CreateFMul(L, R, "multmp");
+		case DIV: 			return context.builder.CreateFDiv(L, R, "divtmp");
+		case MOD:			return context.builder.CreateSRem(L, R, "remtmp");
 		case OR:			instr = Instruction::Or; goto math;
 		case AND:			instr = Instruction::And; goto math;
 		case XOR:			instr = Instruction::Xor; goto math;
 		
-		case GT:			L = Builder.CreateICmpSGT(L, R, "gttmp"); 	goto cond;
-		case LT:			L = Builder.CreateICmpSLT(L, R, "ltvtmp"); goto cond;
-		case GTEQ:			L = Builder.CreateICmpSGE(L, R, "getmp"); goto cond;
-		case LTEQ:			L = Builder.CreateICmpSLE(L, R, "letmp"); goto cond;
-		case NOTEQ:			L = Builder.CreateICmpNE(L, R, "andtmp"); goto cond;
-		case EQEQ:			return Builder.CreateICmpEQ(L, R, "andtmp"); goto cond;
-		case ANDAND:		return Builder.CreateAnd(L, R, "andtmp"); goto cond;
-		case OROR:			return Builder.CreateOr(L, R, "ortmp"); goto cond;
+		case GT:			L = context.builder.CreateICmpSGT(L, R, "gttmp"); 	goto cond;
+		case LT:			L = context.builder.CreateICmpSLT(L, R, "ltvtmp"); goto cond;
+		case GTEQ:			L = context.builder.CreateICmpSGE(L, R, "getmp"); goto cond;
+		case LTEQ:			L = context.builder.CreateICmpSLE(L, R, "letmp"); goto cond;
+		case NOTEQ:			L = context.builder.CreateICmpNE(L, R, "andtmp"); goto cond;
+		case EQEQ:			return context.builder.CreateICmpEQ(L, R, "andtmp"); goto cond;
+		case ANDAND:		return context.builder.CreateAnd(L, R, "andtmp"); goto cond;
+		case OROR:			return context.builder.CreateOr(L, R, "ortmp"); goto cond;
 		
 		
 	}
@@ -198,7 +211,7 @@ Value* NBinaryOp::codeGen(CodeGenContext& context)
 	return NULL;
 
 cond:
-	     return Builder.CreateUIToFP(L, Type::getDoubleTy(TheContext),
+	     return context.builder.CreateUIToFP(L, Type::getDoubleTy(TheContext),
                                 "booltmp");
 math:
 	return BinaryOperator::Create(instr, lhs.codeGen(context), 
@@ -213,8 +226,8 @@ Value* NUnaryOp::codeGen(CodeGenContext& context)
 	switch (op) {		
 		case COMP:			BinaryOperator::Create(Instruction::Xor, 0xFFFFFFFF, 
 										R, "", context.currentBlock());
-		case NOT:			return Builder.CreateNot(R, "subtmp");
-		case MINUS:			return Builder.CreateFSub(0, R, "subtmp");
+		case NOT:			return context.builder.CreateNot(R, "subtmp");
+		case MINUS:			return context.builder.CreateFSub(0, R, "subtmp");
 		
 	}
 
