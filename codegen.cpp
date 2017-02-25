@@ -327,3 +327,41 @@ Value* NBlock::codeGen(CodeGenContext& context)
 	return last;
 }
 
+
+Value* NIf::codeGen(CodeGenContext& context){
+	  Value *CondV = expression->codegen();
+  if (!CondV)
+    return nullptr;
+	CondV = Builder.CreateFCmpONE(CondV, ConstantFP::get(context, APFloat(0.0)), "ifcond");
+	Function *TheFunction = Builder.GetInsertBlock()->getParent();
+		
+	BasicBlock *ThenBB = BasicBlock::Create(context, "then", TheFunction);
+	BasicBlock *ElseBB = BasicBlock::Create(context, "else");
+	BasicBlock *MergeBB = BasicBlock::Create(context, "ifcont");
+	Builder.CreateCondBr(CondV, ThenBB, ElseBB);
+	Builder.SetInsertPoint(ThenBB);
+	Value *ThenV = if_block->codegen();
+	if (!ThenV)
+		return nullptr;
+
+	Builder.CreateBr(MergeBB);
+	ThenBB = Builder.GetInsertBlock();
+	
+	TheFunction->getBasicBlockList().push_back(ElseBB);
+	Builder.SetInsertPoint(ElseBB);
+	
+	Value *ElseV = else_block->codegen();
+	if (!ElseV)
+		return nullptr;
+
+	Builder.CreateBr(MergeBB);
+	ElseBB = Builder.GetInsertBlock();
+	
+	  TheFunction->getBasicBlockList().push_back(MergeBB);
+  Builder.SetInsertPoint(MergeBB);
+  PHINode *PN = Builder.CreatePHI(Type::getDoubleTy(TheContext), 2, "iftmp");
+
+  PN->addIncoming(ThenV, ThenBB);
+  PN->addIncoming(ElseV, ElseBB);
+  return PN;
+}
