@@ -19,7 +19,7 @@
 
 using namespace llvm;
 
-class NBlock;
+class NProgram;
 
 class CodeGenBlock {
 public:
@@ -31,13 +31,16 @@ public:
 class CodeGenContext {
 	std::stack<CodeGenBlock *> blocks;
 	Function *startFunction;
-	Function *finsishFunction;
-	IRBuilder<> builder(context); 
+	Function *finishFunction;
+ 
 	
 public:
     Module *module;
+	IRBuilder<>* builder;
     CodeGenContext() { 
-	module = new Module("start", getGlobalContext());
+	LLVMContext & context = getGlobalContext();
+	module = new Module("start", context);
+	builder = new IRBuilder<>(context);
 	startFunction = NULL;
 	finishFunction = NULL;
 }

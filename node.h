@@ -1,3 +1,5 @@
+#include "debug_mode.h"
+
 #include <iostream>
 #include <vector>
 #if TEST_MODE > TEST_AST_GEN
@@ -5,20 +7,31 @@
 #endif
 
 #if TEST_MODE > TEST_AST
-#define CODEGEN_FUNC()	virtual llvm::Value*	codeGen(CodeGenContext& context)
 #define TEST_PRINT() 
 #define TEST_PRINT_LEAF(token)	
 #define TEST_PRINT_MEM(token)
 #define TEST_PRINT_ME(level)
 #else
-#define CODEGEN_FUNC()	/*virtual void*		codeGen(CodeGenContext& context)*/
-#define TEST_PRINT()		//do{std::cout << __PRETTY_FUNCTION__ << std::endl; }while(0)
+#define TEST_PRINT()		do{std::cout << __PRETTY_FUNCTION__ << std::endl; }while(0)
 #define TEST_PRINT_LEAF(token)	do{std::cout << (token) << " ";}while(0)
 #define TEST_PRINT_MEM(token)	do{(token).print();}while(0)
 #define TEST_PRINT_ME(level)	do{if( AST_DEBUG_LEVEL <= (level) ) {this->print(); std::cout << std::endl;} }while(0)
 #endif
 
+#if HAS_CODEGEN
+
+#define CODEGEN_FUNC()	llvm::Value*	codeGen(CodeGenContext& context)
+#define VIRTUAL_CODEGEN_FUNC() virtual CODEGEN_FUNC() {}
+
+#else
+
+#define CODEGEN_FUNC()	/*virtual void*		codeGen(CodeGenContext& context)*/
+#define VIRTUAL_CODEGEN_FUNC()
+
+#endif
+
 /* What Parser knows */
+class CodeGenContext;
 class Node;
 class NExpression;
 class NConst;
@@ -68,43 +81,43 @@ class NConditional;
 class Node {
 public:
 	virtual ~Node() {}
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC()
 	virtual void print() {}
 };
 
 class NExpression : public Node {
 public:
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC();
 	virtual void print() {}
 };
 
 class NStatement : public Node {
 public:
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC();
 	virtual void print() {}
 };
 
 class NConst   : public NExpression {
 public:
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC();
 	virtual void print() {}
 };
 
 class NDecl : public Node {
 public:
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC();
 	virtual void print() {}
 };
 
 class AssignmentLHS : public Node {
 public:
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC();
 	virtual void print() {}
 };
 
 class NConditional : public NStatement {
 public:
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC();
 	virtual void print() {}
 };
 
@@ -113,13 +126,13 @@ public:
 	virtual int start() {}
 	virtual int step() {}
 	virtual int end() {}
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC();
 	virtual void print() {}
 };
 
 class NForRangeOperand : public Node {
 public:
-	CODEGEN_FUNC();
+	VIRTUAL_CODEGEN_FUNC();
 	virtual void print() {}
 };
 
@@ -232,6 +245,7 @@ public:
 	NExpression& e;
 	NArrayExpr(NIdentifier& id, NExpression& e) :
 		id(id), e(e) { TEST_PRINT(); TEST_PRINT_ME(2); }
+	CODEGEN_FUNC();
 	void print(){
 		TEST_PRINT_MEM(id);
 		TEST_PRINT_LEAF("[");
@@ -280,6 +294,7 @@ public:
 	int size;
 	TsDecl( int type, int size ) :
 		type(type), size(size) { TEST_PRINT(); TEST_PRINT_ME(3); }
+	CODEGEN_FUNC();
 	void print(){
 		TEST_PRINT_LEAF(type);
 		TEST_PRINT_LEAF(":");
@@ -538,14 +553,16 @@ class NProgram : public Node {
 public:
 	DeclarationList& declarations;
 	NIdentifier& start;
-	NIdentifier& finish;
-	NProgram(DeclarationList& declarations, NIdentifier& start, NIdentifier& finish) :
+	NIdentifier* finish;
+	NProgram(DeclarationList& declarations, NIdentifier& start, NIdentifier* finish) :
 		declarations(declarations), start(start), finish(finish) { TEST_PRINT(); TEST_PRINT_ME(9); }
 	CODEGEN_FUNC();
 	void print(){
 		DeclarationList::reverse_iterator rit;
 		TEST_PRINT_LEAF("Program: Starts   with: "); TEST_PRINT_MEM(start ); TEST_PRINT_LEAF(std::endl);
-		TEST_PRINT_LEAF("Program: Finishes with: "); TEST_PRINT_MEM(finish); TEST_PRINT_LEAF(std::endl);
+		if(finish != NULL){
+			TEST_PRINT_LEAF("Program: Finishes with: "); TEST_PRINT_MEM(*finish); TEST_PRINT_LEAF(std::endl);
+		}
 		TEST_PRINT_LEAF("Program: Begin");TEST_PRINT_LEAF(std::endl);
 		for (rit = declarations.rbegin(); rit != declarations.rend(); rit++) {
 			TEST_PRINT_MEM(**rit);

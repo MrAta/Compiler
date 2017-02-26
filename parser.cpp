@@ -1572,7 +1572,7 @@ yyreduce:
 #line 211 "Aparser.y" /* yacc.c:1646  */
     {
 #if TEST_MODE > TEST_PARSER
-(yyval.prog) = programBlock = new NProgram(*(yyvsp[0].dec_l), *start, *finish);
+(yyval.prog) = programBlock = new NProgram(*(yyvsp[0].dec_l), *start, finish);
 #endif
 }
 #line 1579 "parser.cpp" /* yacc.c:1646  */
@@ -2821,11 +2821,38 @@ yyreturn:
 }
 #line 896 "Aparser.y" /* yacc.c:1906  */
 
-
-#if TEST_MODE < TEST_NONE && TEST_MODE > TEST_SCANNER
-
+#if 0
 #include<cctype>
 #include<cstring>
+int count=0;
+extern int yyparse();
+using namespace std;
+//void createCoreFunctions(CodeGenContext& context);
+
+int main(int argc, char **argv)
+{
+	yyparse();
+	cout << programBlock << endl;
+    // see http://comments.gmane.org/gmane.comp.compilers.llvm.devel/33877
+	/*InitializeNativeTarget();
+	InitializeNativeTargetAsmPrinter();
+	InitializeNativeTargetAsmParser();
+	CodeGenContext context;
+	createCoreFunctions(context);
+	context.generateCode(*programBlock);
+	context.runCode();*/
+
+//	programBlock->codeGen();	
+	return 0;
+}
+
+
+
+#if TEST_MODE < TEST_NONE && TEST_MODE > TEST_SCANNER
+#include "codegen.h"
+#include<cctype>
+#include<cstring>
+
 int count=0;
 extern int yyparse();
 
@@ -2835,12 +2862,17 @@ int main(int argc, char *argv[])
 //	yyout = fopen(argv[2], "w");
 //	*strstr(argv[1], ".lulu") = '\0';
 //	yyout = fopen(strcat(argv[1], "ParseReport.txt"), "w");
-	
+
 	if(!yyparse()){
 		printf("yes\n");
 	}else{
 		printf("no\n");
 	}
+	InitializeNativeTarget();
+	InitializeNativeTargetAsmPrinter();
+	InitializeNativeTargetAsmParser();
+	CodeGenContext context;
+
 //	fclose(yyin);
 //	fclose(yyout);
     return 0;
@@ -2854,5 +2886,5 @@ void yyerror(char *s) {
 	printf("%d : %s %s\n", yylineno, s, yytext );
 } 
  */
-
+#endif
 #endif

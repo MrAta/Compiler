@@ -5,10 +5,10 @@
 using namespace std;
 
 extern int yyparse();
-extern NBlock* programBlock;
+extern NProgram* programBlock;
 
 
-llvm::Function* createPrintfFunction(CodeGenContext& context)
+llvm::Function* createWriteFunction(CodeGenContext& context)
 {
     std::vector<llvm::Type*> printf_arg_types;
     printf_arg_types.push_back(llvm::Type::getInt8PtrTy(getGlobalContext())); //char*
@@ -19,25 +19,25 @@ llvm::Function* createPrintfFunction(CodeGenContext& context)
 
     llvm::Function *func = llvm::Function::Create(
                 printf_type, llvm::Function::ExternalLinkage,
-                llvm::Twine("printf"),
+                llvm::Twine("write"),
                 context.module
            );
     func->setCallingConv(llvm::CallingConv::C);
     return func;
 }
 
-void createwriteFunction(CodeGenContext& context, llvm::Function* printfFn)
+void createEchoFunction(CodeGenContext& context, llvm::Function* printfFn)
 {
-    std::vector<llvm::Type*> write_arg_types;
-    write_arg_types.push_back(llvm::Type::getInt64Ty(getGlobalContext()));
+    std::vector<llvm::Type*> echo_arg_types;
+    echo_arg_types.push_back(llvm::Type::getInt64Ty(getGlobalContext()));
 
-    llvm::FunctionType* write_type =
+    llvm::FunctionType* echo_type =
         llvm::FunctionType::get(
-            llvm::Type::getVoidTy(getGlobalContext()), write_arg_types, false);
+            llvm::Type::getVoidTy(getGlobalContext()), echo_arg_types, false);
 
     llvm::Function *func = llvm::Function::Create(
-                write_type, llvm::Function::InternalLinkage,
-                llvm::Twine("write"),
+                echo_type, llvm::Function::InternalLinkage,
+                llvm::Twine("echo"),
                 context.module
            );
     llvm::BasicBlock *bblock = llvm::BasicBlock::Create(getGlobalContext(), "entry", func, 0);
@@ -73,6 +73,6 @@ void createwriteFunction(CodeGenContext& context, llvm::Function* printfFn)
 }
 
 void createCoreFunctions(CodeGenContext& context){
-	llvm::Function* printfFn = createPrintfFunction(context);
-    createwriteFunction(context, printfFn);
+	llvm::Function* printfFn = createWriteFunction(context);
+    createEchoFunction(context, printfFn);
 }
